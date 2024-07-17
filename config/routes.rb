@@ -5,13 +5,13 @@ Rails.application.routes.draw do
     registrations: 'admin_users/registrations',
     passwords: 'admin_users/passwords'
   }, path_names: {
-    sign_in: 'admin_login',
-    sign_out: 'admin_logout',
-    password: 'admin_secret',
-    confirmation: 'admin_verification',
-    unlock: 'admin_unblock',
-    registration: 'admin_register',
-    sign_up: 'admin_cmon_let_me_in'
+    sign_in: 'login',
+    sign_out: 'logout',
+    password: 'secret',
+    confirmation: 'verification',
+    unlock: 'unblock',
+    registration: 'register',
+    sign_up: 'cmon_let_me_in'
   }
 
   # ActiveAdmin routes

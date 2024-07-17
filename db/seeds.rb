@@ -9,6 +9,15 @@ ActiveRecord::Base.transaction do
     Province.find_or_create_by!(province)
   end
 
+  # Admin Users
+  unless AdminUser.exists?(email: 'admin@example.com')
+    AdminUser.create!(
+      email: 'admin@example.com',
+      password: 'password',
+      password_confirmation: 'password'
+    )
+  end
+
   # Users
   unless User.exists?(email: 'admin@example.com')
     User.create!(

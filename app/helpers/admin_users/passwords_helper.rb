@@ -1,0 +1,2 @@
+module AdminUsers::PasswordsHelper
+end

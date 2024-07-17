@@ -8,7 +8,7 @@ FILES_TO_INCLUDE=(
   "app/controllers"
   "app/models"
   "app/views"
-  "config/routes.rb"
+  "config"
   "db/migrate"
   "db/seeds.rb"
   "Gemfile"
