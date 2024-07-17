@@ -1,0 +1,37 @@
+Rails.application.routes.draw do
+  # Define Devise routes for admin users with custom paths
+  devise_for :admin_users, path: 'admin', controllers: {
+    sessions: 'admin_users/sessions',
+    registrations: 'admin_users/registrations',
+    passwords: 'admin_users/passwords'
+  }, path_names: {
+    sign_in: 'admin_login',
+    sign_out: 'admin_logout',
+    password: 'admin_secret',
+    confirmation: 'admin_verification',
+    unlock: 'admin_unblock',
+    registration: 'admin_register',
+    sign_up: 'admin_cmon_let_me_in'
+  }
+
+  # ActiveAdmin routes
+  ActiveAdmin.routes(self)
+
+  # Devise routes for regular users
+  devise_for :users, controllers: {
+    sessions: 'users/sessions',
+    registrations: 'users/registrations',
+    passwords: 'users/passwords'
+  }
+
+  # Cart and Orders routes
+  resource :cart, only: [:show] do
+    post 'add/:id', to: 'cart#add', as: 'add_to'
+    delete 'remove/:id', to: 'cart#remove', as: 'remove_from'
+  end
+
+  resources :orders, only: [:new, :create, :show]
+
+  # Define the root path route ("/")
+  root to: "home#index"
+end

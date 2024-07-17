@@ -1,0 +1,16 @@
+<h1>Your Shopping Cart</h1>
+
+<% if @cart.any? %>
+  <ul>
+    <% @cart.each do |id, quantity| %>
+      <% product = Product.find(id) %>
+      <li>
+        <%= product.name %> - Quantity: <%= quantity %> - Price: <%= number_to_currency(product.price) %>
+        <%= button_to 'Remove', remove_from_cart_path(id), method: :delete %>
+      </li>
+    <% end %>
+  </ul>
+  <%= link_to 'Checkout', new_order_path, class: 'btn btn-primary' %>
+<% else %>
+  <p>Your cart is empty.</p>
+<% end %>

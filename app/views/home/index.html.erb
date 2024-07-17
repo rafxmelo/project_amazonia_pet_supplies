@@ -1,0 +1,14 @@
+<h1>Welcome to Amazonia Pet Supplies</h1>
+<p>Your one-stop shop for all your pet supply needs!</p>
+
+<h2>Featured Products</h2>
+<ul>
+  <% @products.each do |product| %>
+    <li>
+      <%= product.name %> - <%= number_to_currency(product.price) %>
+      <%= image_tag product.image, alt: product.name if product.image.attached? %>
+      <%= button_to 'Add to Cart', add_to_cart_path(product), method: :post %>
+    </li>
+  <% end %>
+</ul>
+<%= link_to 'View Cart', cart_path, class: 'btn btn-primary' %>
