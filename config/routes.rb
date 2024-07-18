@@ -31,6 +31,7 @@ Rails.application.routes.draw do
   end
 
   resources :orders, only: [:new, :create, :show]
+  resources :products, only: [:show]
 
   # Define the root path route ("/")
   root to: "home#index"
