@@ -11,4 +11,8 @@ class Order < ApplicationRecord
       order_items.build(product: product, quantity: quantity, price: product.price)
     end
   end
+
+  def self.ransackable_attributes(auth_object = nil)
+    ["created_at", "id", "status", "total_amount", "updated_at", "user_id"]
+  end
 end
