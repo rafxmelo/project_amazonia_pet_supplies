@@ -1,4 +1,3 @@
-### app/admin/pages.rb ###
 ActiveAdmin.register Page do
   permit_params :title, :content
 
@@ -14,7 +13,9 @@ ActiveAdmin.register Page do
     selectable_column
     id_column
     column :title
-    column :content
+    column :content do |page|
+      raw truncate(page.content, length: 100)
+    end
     column :created_at
     column :updated_at
     actions
@@ -23,9 +24,9 @@ ActiveAdmin.register Page do
   show do
     attributes_table do
       row :title
-      row :content
-      row :created_at
-      row :updated_at
+      row :content do |page|
+        raw page.content
+      end
     end
   end
 end

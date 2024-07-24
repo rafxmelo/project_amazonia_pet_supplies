@@ -1,0 +1,8 @@
+<div class="product">
+  <h2><%= link_to product.name, product_path(product) %></h2>
+  <p><%= product.description %></p>
+  <p><%= number_to_currency(product.price) %></p>
+  <% if product.image.attached? %>
+    <%= image_tag product.image %>
+  <% end %>
+</div>

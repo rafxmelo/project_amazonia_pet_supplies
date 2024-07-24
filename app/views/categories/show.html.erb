@@ -1,0 +1,10 @@
+<h1><%= @category.name %> Products</h1>
+<ul>
+  <% @products.each do |product| %>
+    <li>
+      <%= link_to product.name, product_path(product) %>
+      - <%= number_to_currency(product.price) %>
+    </li>
+  <% end %>
+</ul>
+<%= link_to 'Back to Home', root_path %>
