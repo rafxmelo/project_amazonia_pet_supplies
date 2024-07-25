@@ -7,3 +7,4 @@
 //= link quill/dist/quill.js
 //= link quill/dist/quill.snow.css
 //= link_directory ../../javascript/controllers .js
+//= link rails-ujs.js

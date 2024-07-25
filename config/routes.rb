@@ -14,6 +14,7 @@ Rails.application.routes.draw do
     sign_up: 'cmon_let_me_in'
   }
 
+
   # ActiveAdmin routes
   ActiveAdmin.routes(self)
 
@@ -25,8 +26,9 @@ Rails.application.routes.draw do
   }
 
   # Cart and Orders routes
-  resource :cart, only: [:show] do
+  resource :cart, only: [:show], controller: 'cart' do
     post 'add/:id', to: 'cart#add', as: 'add_to'
+    post 'update/:id', to: 'cart#update', as: 'update'
     delete 'remove/:id', to: 'cart#remove', as: 'remove_from'
   end
 

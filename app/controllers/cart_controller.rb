@@ -1,7 +1,7 @@
 class CartController < ApplicationController
   def show
     @cart = session[:cart] || {}
-    @products = Product.find(@cart.keys)
+    @products = Product.where(id: @cart.keys).to_a
   end
 
   def add

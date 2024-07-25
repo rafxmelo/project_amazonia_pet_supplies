@@ -1,13 +1,16 @@
 <h1>Checkout</h1>
-
 <%= form_with model: @order, local: true do |form| %>
+  <div>
+    <%= form.label :address %>
+    <%= form.text_field :address, value: current_user.address %>
+  </div>
+  <div>
+    <%= form.label :province %>
+    <%= form.collection_select :province_id, Province.all, :id, :name, selected: current_user.province_id %>
+  </div>
   <div>
     <%= form.label :total_amount %>
     <%= form.number_field :total_amount, value: @order.calculate_total_amount, readonly: true %>
   </div>
-  <div>
-    <%= form.label :status %>
-    <%= form.select :status, ['Pending', 'Completed'], selected: 'Pending' %>
-  </div>
-  <%= form.submit 'Place Order', class: 'btn btn-primary' %>
+  <%= form.submit 'Place Order' %>
 <% end %>
