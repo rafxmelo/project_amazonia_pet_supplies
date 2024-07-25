@@ -50,7 +50,8 @@ ActiveRecord::Base.transaction do
       name: Faker::Commerce.product_name,
       description: Faker::Lorem.paragraph,
       price: Faker::Commerce.price,
-      stock_quantity: rand(1..100)
+      stock_quantity: rand(1..100),
+      on_sale: false
     )
 
     # Randomly assign an image to the product

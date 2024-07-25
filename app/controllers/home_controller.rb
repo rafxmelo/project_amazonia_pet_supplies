@@ -2,7 +2,7 @@ class HomeController < ApplicationController
   def index
     @products = Product.limit(5)
     @on_sale_products = Product.on_sale
-    @new_products = Product.new_products
+    @new_products = Product.newly_added
     @recently_updated_products = Product.recently_updated
     @categories = Category.all
   end

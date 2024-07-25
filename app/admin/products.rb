@@ -1,5 +1,6 @@
+# app/admin/products.rb
 ActiveAdmin.register Product do
-  permit_params :name, :description, :price, :stock_quantity, :image, category_ids: []
+  permit_params :name, :description, :price, :stock_quantity, :on_sale, :image, category_ids: []
 
   form do |f|
     f.inputs "Product Details" do
@@ -7,6 +8,7 @@ ActiveAdmin.register Product do
       f.input :description
       f.input :price
       f.input :stock_quantity
+      f.input :on_sale # Ensure this line is present
       f.input :image, as: :file
       f.input :categories, as: :check_boxes, collection: Category.all
     end
@@ -19,6 +21,7 @@ ActiveAdmin.register Product do
       row :description
       row :price
       row :stock_quantity
+      row :on_sale # Ensure this line is present
       row :created_at
       row :updated_at
       row :categories do |product|
@@ -42,6 +45,7 @@ ActiveAdmin.register Product do
     column :description
     column :price
     column :stock_quantity
+    column :on_sale # Ensure this line is present
     column :created_at
     column :updated_at
     column :categories do |product|
@@ -49,4 +53,13 @@ ActiveAdmin.register Product do
     end
     actions
   end
+
+  filter :name
+  filter :description
+  filter :price
+  filter :stock_quantity
+  filter :on_sale, as: :select # Ensure this line is present
+  filter :created_at
+  filter :updated_at
+  filter :categories
 end

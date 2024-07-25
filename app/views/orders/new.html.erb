@@ -3,7 +3,7 @@
 <%= form_with model: @order, local: true do |form| %>
   <div>
     <%= form.label :total_amount %>
-    <%= form.number_field :total_amount, value: session[:cart].sum { |id, quantity| Product.find(id).price * quantity }, readonly: true %>
+    <%= form.number_field :total_amount, value: @order.calculate_total_amount, readonly: true %>
   </div>
   <div>
     <%= form.label :status %>
