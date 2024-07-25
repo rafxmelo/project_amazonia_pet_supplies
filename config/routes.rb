@@ -14,7 +14,9 @@ Rails.application.routes.draw do
     sign_up: 'cmon_let_me_in'
   }
 
-
+  devise_scope :admin_user do
+    get 'admin/logout', to: 'admin_users/sessions#destroy', as: :custom_destroy_admin_user_session
+  end
   # ActiveAdmin routes
   ActiveAdmin.routes(self)
 
