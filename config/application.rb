@@ -2,6 +2,9 @@ require_relative "boot"
 
 require "rails/all"
 
+require "active_storage/engine"
+
+
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
@@ -15,7 +18,7 @@ module AmazoniaPetSupplies
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w(assets tasks))
-
+    config.active_job.queue_adapter = :inline
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files

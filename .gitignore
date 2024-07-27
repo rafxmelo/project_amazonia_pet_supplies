@@ -30,7 +30,7 @@
 !/tmp/storage/.keep
 
 /public/assets
-
+/vips-8.13.3
 /node_modules
 
 # Ignore master key for decrypting credentials and more.

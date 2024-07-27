@@ -7,32 +7,37 @@ require 'net/http'
 ActiveRecord::Base.transaction do
   # Provinces
   provinces = [
-    { name: 'Ontario', gst: 0.05, pst: 0.08, hst: 0.13 },
-    { name: 'Quebec', gst: 0.05, pst: 0.0975, hst: 0 }
-    # Add more provinces as needed
-  ]
+  { name: 'Ontario', gst: 0.05, pst: 0.08, hst: 0.13 },
+  { name: 'Quebec', gst: 0.05, pst: 0.09975, hst: 0 },
+  { name: 'British Columbia', gst: 0.05, pst: 0.07, hst: 0 },
+  { name: 'Alberta', gst: 0.05, pst: 0, hst: 0 },
+  { name: 'Manitoba', gst: 0.05, pst: 0.07, hst: 0 },
+  { name: 'Saskatchewan', gst: 0.05, pst: 0.06, hst: 0 },
+  { name: 'Nova Scotia', gst: 0.05, pst: 0, hst: 0.15 },
+  { name: 'New Brunswick', gst: 0.05, pst: 0, hst: 0.15 },
+  { name: 'Newfoundland and Labrador', gst: 0.05, pst: 0, hst: 0.15 },
+  { name: 'Prince Edward Island', gst: 0.05, pst: 0, hst: 0.15 },
+  { name: 'Northwest Territories', gst: 0.05, pst: 0, hst: 0 },
+  { name: 'Yukon', gst: 0.05, pst: 0, hst: 0 },
+  { name: 'Nunavut', gst: 0.05, pst: 0, hst: 0 }
+]
   provinces.each do |province|
     Province.find_or_create_by!(province)
   end
 
   # Admin Users
-  unless AdminUser.exists?(email: 'admin@example.com')
-    AdminUser.create!(
-      email: 'admin@example.com',
-      password: 'password',
-      password_confirmation: 'password'
-    )
+  AdminUser.find_or_create_by!(email: 'admin@example.com') do |admin|
+    admin.password = 'password'
+    admin.password_confirmation = 'password'
   end
 
+
   # Users
-  unless User.exists?(email: 'admin@example.com')
-    User.create!(
-      username: 'jao',
-      email: 'jao@example.com',
-      password: 'password',
-      address: '123 Main St',
-      province: Province.first
-    )
+  User.find_or_create_by!(email: 'jao@example.com') do |user|
+    user.username = 'jao'
+    user.password = 'password'
+    user.address = '123 Main St'
+    user.province = Province.first
   end
 
   # Categories
@@ -57,7 +62,7 @@ ActiveRecord::Base.transaction do
     # Randomly assign an image to the product
     image_path = image_paths.sample
     if File.exist?(image_path)
-      product.image.attach(io: File.open(image_path), filename: File.basename(image_path))
+      product.image.attach(io: File.open(image_path), filename: File.basename(image_path), content_type: 'image/jpg')
     else
       puts "Image file not found: #{image_path}"
     end

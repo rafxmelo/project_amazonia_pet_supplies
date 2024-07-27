@@ -10,7 +10,7 @@ Rails.application.config.assets.version = "1.0"
 # application.js, application.css, and all non-JS/CSS in the app/assets
 # folder are already added.
 # Rails.application.config.assets.precompile += %w( admin.js admin.css )
-Rails.application.config.assets.precompile += %w( quill/quill.js quill/quill.snow.css activeadmin/quill_editor/quill_editor.js )
+Rails.application.config.assets.precompile += %w( activeadmin/quill_editor/quill_editor.js )
 Rails.application.config.assets.paths << Rails.root.join('node_modules')
 Rails.application.config.assets.paths << Rails.root.join('app/assets/javascripts')
 Rails.application.config.assets.paths << Rails.root.join('app/assets/stylesheets')

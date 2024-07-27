@@ -8,7 +8,7 @@ ActiveAdmin.register Product do
       f.input :description
       f.input :price
       f.input :stock_quantity
-      f.input :on_sale # Ensure this line is present
+      f.input :on_sale
       f.input :image, as: :file
       f.input :categories, as: :check_boxes, collection: Category.all
     end
@@ -21,7 +21,7 @@ ActiveAdmin.register Product do
       row :description
       row :price
       row :stock_quantity
-      row :on_sale # Ensure this line is present
+      row :on_sale
       row :created_at
       row :updated_at
       row :categories do |product|
@@ -45,7 +45,7 @@ ActiveAdmin.register Product do
     column :description
     column :price
     column :stock_quantity
-    column :on_sale # Ensure this line is present
+    column :on_sale
     column :created_at
     column :updated_at
     column :categories do |product|
@@ -58,7 +58,7 @@ ActiveAdmin.register Product do
   filter :description
   filter :price
   filter :stock_quantity
-  filter :on_sale, as: :select # Ensure this line is present
+  filter :on_sale, as: :select
   filter :created_at
   filter :updated_at
   filter :categories

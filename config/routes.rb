@@ -51,7 +51,19 @@ Rails.application.routes.draw do
   get '/contact', to: 'pages#show', defaults: { id: Page.find_by(title: 'Contact')&.id || -1 }
   get '/about', to: 'pages#show', defaults: { id: Page.find_by(title: 'About')&.id || -1 }
 
+  require 'active_storage/engine'
+  ActiveStorage::Engine.routes.draw do
+    get  "/blobs/redirect/:signed_id/*filename" => "active_storage/blobs#show", as: :rails_storage_redirect
+    get  "/blobs/:signed_id/*filename" => "active_storage/blobs#show", as: :rails_storage_proxy
+    get  "/representations/redirect/:signed_blob_id/:variation_key/*filename" => "active_storage/representations#show", as: :rails_blob_representation_redirect
+    get  "/representations/:signed_blob_id/:variation_key/*filename" => "active_storage/representations#show", as: :rails_blob_representation_proxy
+    get  "/disk/:encoded_key/*filename" => "active_storage/disk#show", as: :rails_disk_service
+    put  "/disk/:encoded_token" => "active_storage/disk#update", as: :update_rails_disk_service
+    post "/direct_uploads" => "active_storage/direct_uploads#create", as: :rails_direct_uploads
+  end
   # Define the root path route ("/")
   root to: "home#index"
   get 'search', to: 'home#search'
+
+
 end
