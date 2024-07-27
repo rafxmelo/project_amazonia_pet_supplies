@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   devise_scope :admin_user do
     get 'admin/logout', to: 'admin_users/sessions#destroy', as: :custom_destroy_admin_user_session
   end
+
   # ActiveAdmin routes
   ActiveAdmin.routes(self)
 
@@ -30,9 +31,10 @@ Rails.application.routes.draw do
   # Cart and Orders routes
   resource :cart, only: [:show], controller: 'cart' do
     post 'add/:id', to: 'cart#add', as: 'add_to'
-    post 'update/:id', to: 'cart#update', as: 'update'
+    patch 'update/:id', to: 'cart#update', as: 'update'
     delete 'remove/:id', to: 'cart#remove', as: 'remove_from'
   end
+
 
   resources :orders, only: [:new, :create, :show]
   resources :products, only: [:index, :show]

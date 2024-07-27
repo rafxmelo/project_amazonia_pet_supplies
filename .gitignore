@@ -38,3 +38,10 @@
 collect_project_files.sh
 project_files.txt
 project_tree.txt
+
+/public/packs
+/public/packs-test
+/node_modules
+/yarn-error.log
+yarn-debug.log*
+.yarn-integrity
