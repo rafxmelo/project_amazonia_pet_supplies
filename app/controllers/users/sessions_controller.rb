@@ -1,5 +1,5 @@
-# app/controllers/admin_users/sessions_controller.rb
-class AdminUsers::SessionsController < Devise::SessionsController
+# app/controllers/users/sessions_controller.rb
+class Users::SessionsController < Devise::SessionsController
   # GET /resource/sign_in
   def new
     super
@@ -12,15 +12,10 @@ class AdminUsers::SessionsController < Devise::SessionsController
 
   # DELETE /resource/sign_out
   def destroy
-    sign_out(current_admin_user)
-    redirect_to root_path, notice: 'You have been logged out.'
+    super
   end
 
   protected
-
-  def after_sign_in_path_for(resource)
-    admin_dashboard_path
-  end
 
   # If you have extra params to permit, append them to the sanitizer.
   def configure_sign_in_params

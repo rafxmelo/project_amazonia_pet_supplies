@@ -5,7 +5,7 @@ ruby "3.3.3"
 gem "rails", "~> 7.1.3", ">= 7.1.3.4"
 gem "sprockets-rails"
 gem "sqlite3", "~> 1.4"
-gem "puma", ">= 5.0"
+gem 'puma', '~> 6.4.2'
 gem 'bcrypt', '~> 3.1.7'
 gem 'activeadmin'
 gem 'devise'

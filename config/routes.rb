@@ -13,20 +13,27 @@ Rails.application.routes.draw do
     registration: 'register',
     sign_up: 'cmon_let_me_in'
   }
-
   devise_scope :admin_user do
     get 'admin/logout', to: 'admin_users/sessions#destroy', as: :custom_destroy_admin_user_session
+  end
+
+  namespace :admin do
+    get 'dashboard', to: 'dashboard#index'
   end
 
   # ActiveAdmin routes
   ActiveAdmin.routes(self)
 
-  # Devise routes for regular users
+  # Devise routes for regular users with custom paths
   devise_for :users, controllers: {
     sessions: 'users/sessions',
     registrations: 'users/registrations',
     passwords: 'users/passwords'
   }
+
+  devise_scope :user do
+    get 'users/logout', to: 'users/sessions#destroy', as: :custom_destroy_user_session
+  end
 
   # Cart and Orders routes
   resource :cart, only: [:show], controller: 'cart' do
@@ -34,7 +41,6 @@ Rails.application.routes.draw do
     patch 'update/:id', to: 'cart#update', as: 'update'
     delete 'remove/:id', to: 'cart#remove', as: 'remove_from'
   end
-
 
   resources :orders, only: [:new, :create, :show]
   resources :products, only: [:index, :show]

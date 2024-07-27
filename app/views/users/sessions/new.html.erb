@@ -1,4 +1,4 @@
-<h2>User Log in</h2>
+<h2>Log in</h2>
 
 <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
   <div class="field">
@@ -23,12 +23,4 @@
   </div>
 <% end %>
 
-<%= render "devise/shared/links" %>
-
-<% if flash[:alert] %>
-  <div class="alert alert-danger"><%= flash[:alert] %></div>
-<% end %>
-
-<% if flash[:notice] %>
-  <div class="alert alert-success"><%= flash[:notice] %></div>
-<% end %>
+<%= render "users/shared/links" %>

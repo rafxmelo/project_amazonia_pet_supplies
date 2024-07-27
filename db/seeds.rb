@@ -27,8 +27,8 @@ ActiveRecord::Base.transaction do
   # Users
   unless User.exists?(email: 'admin@example.com')
     User.create!(
-      username: 'admin',
-      email: 'admin@example.com',
+      username: 'jao',
+      email: 'jao@example.com',
       password: 'password',
       address: '123 Main St',
       province: Province.first

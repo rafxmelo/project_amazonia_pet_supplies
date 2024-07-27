@@ -1,4 +1,5 @@
 class CartController < ApplicationController
+  before_action :authenticate_user!
   def show
     @cart = session[:cart] || {}
     @products = Product.where(id: @cart.keys)
@@ -46,25 +47,20 @@ class CartController < ApplicationController
   def remove
     id = params[:id].to_i
     cart = session[:cart] || {}
+
     Rails.logger.debug "Remove action called with params: #{params.inspect}"
     Rails.logger.debug "Cart before remove: #{cart.inspect}"
+
     if cart.key?(id)
       cart.delete(id)
       Rails.logger.debug "Item removed successfully."
     else
       Rails.logger.debug "Item not found in cart."
     end
+
     session[:cart] = cart
+
     Rails.logger.debug "Cart after remove: #{cart.inspect}"
     redirect_to cart_path
-  end
-
-
-
-
-  private
-
-  def cart
-    session[:cart] ||= {}
   end
 end
