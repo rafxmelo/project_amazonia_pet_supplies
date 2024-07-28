@@ -29,6 +29,14 @@ Rails.application.routes.draw do
     sessions: 'users/sessions',
     registrations: 'users/registrations',
     passwords: 'users/passwords'
+  }, path_names: {
+    sign_in: 'login',
+    sign_out: 'logout',
+    password: 'secret',
+    confirmation: 'verification',
+    unlock: 'unblock',
+    registration: 'register',
+    sign_up: 'cmon_let_me_in'
   }
 
   devise_scope :user do
@@ -42,7 +50,11 @@ Rails.application.routes.draw do
     delete 'remove/:id', to: 'cart#remove', as: 'remove_from'
   end
 
-  resources :orders, only: [:new, :create, :show]
+  resources :orders, only: [:index, :new, :create, :show] do
+    post 'recalculate_total', on: :collection
+  end
+
+
   resources :products, only: [:index, :show]
   resources :pages, only: [:show]
   resources :categories, only: [:show]

@@ -45,3 +45,4 @@ project_tree.txt
 /yarn-error.log
 yarn-debug.log*
 .yarn-integrity
+vips-8.13.3.tar.gz

@@ -1,16 +1,41 @@
 <h1>Checkout</h1>
-<%= form_with model: @order, local: true do |form| %>
+<%= form_with model: @order, local: true, id: 'order_form' do |form| %>
+  <div>
+    <%= form.label :user_name, "Name" %>
+    <%= form.text_field :user_name, value: current_user.username, readonly: true %>
+  </div>
   <div>
     <%= form.label :address %>
-    <%= form.text_field :address, value: current_user.address %>
+    <%= form.text_field :address, value: current_user.address, readonly: true %>
   </div>
   <div>
     <%= form.label :province %>
-    <%= form.collection_select :province_id, Province.all, :id, :name, selected: current_user.province_id %>
+    <%= form.collection_select :province_id, Province.all, :id, :name, selected: current_user.province_id, id: 'order_province_id' %>
   </div>
   <div>
     <%= form.label :total_amount %>
-    <%= form.number_field :total_amount, value: @order.calculate_total_amount, readonly: true %>
+    <%= form.number_field :total_amount, value: @order.total_amount, readonly: true, id: "order_total_amount" %>
   </div>
   <%= form.submit 'Place Order' %>
+  <button type="button" onclick="updateTotal()">Update Total</button>
 <% end %>
+
+<script>
+  function updateTotal() {
+    const provinceId = document.querySelector('#order_province_id').value;
+
+    fetch('/orders/recalculate_total', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': '<%= form_authenticity_token %>'
+      },
+      body: JSON.stringify({ province_id: provinceId })
+    })
+    .then(response => response.json())
+    .then(data => {
+      document.querySelector('#order_total_amount').value = data.total_amount;
+    })
+    .catch(error => console.error('Error:', error));
+  }
+</script>

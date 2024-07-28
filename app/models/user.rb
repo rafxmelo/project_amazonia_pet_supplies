@@ -3,10 +3,11 @@ class User < ApplicationRecord
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
-  belongs_to :province
+  belongs_to :province, optional: true
   has_many :orders, dependent: :destroy
 
-  validates :username, :email, :address, presence: true
+  validates :address, presence: true, if: -> { province_id.present? }
+  validates :username, :email, presence: true
   validates :email, uniqueness: true
 
   def self.ransackable_attributes(auth_object = nil)

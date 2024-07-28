@@ -20,6 +20,7 @@
         <li><%= link_to 'Contact', page_path(Page.find_by(title: 'Contact')) %></li>
         <li><%= link_to 'Products', products_path %></li>
         <% if user_signed_in? %>
+          <li><%= link_to 'Orders', orders_path %></li> <!-- Link to orders page -->
           <li><%= link_to 'Logout', custom_destroy_user_session_path, method: :delete %></li>
         <% else %>
           <li><%= link_to 'Login', new_user_session_path %></li>
