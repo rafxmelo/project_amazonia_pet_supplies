@@ -1,3 +1,4 @@
+# app/admin/orders.rb
 ActiveAdmin.register Order do
   permit_params :status, :user_id, :total_amount, order_items_attributes: [:id, :product_id, :quantity, :price, :_destroy]
 
@@ -19,7 +20,10 @@ ActiveAdmin.register Order do
     column :total_amount do |order|
       number_to_currency(order.total_amount)
     end
-    column :status
+    column :status do |order|
+      status = order.status&.humanize || 'Unknown'
+      status_tag(status, class: order.status || 'unknown')
+    end
     column :created_at
     column :updated_at
     actions
@@ -27,7 +31,7 @@ ActiveAdmin.register Order do
 
   filter :user
   filter :total_amount
-  filter :status
+  filter :status, as: :select, collection: Order.statuses.keys
   filter :created_at
   filter :updated_at
 
@@ -35,7 +39,9 @@ ActiveAdmin.register Order do
     attributes_table do
       row :user
       row :total_amount
-      row :status
+      row :status do |order|
+        order.status&.humanize || 'Unknown'
+      end
       row :created_at
       row :updated_at
     end
@@ -64,7 +70,7 @@ ActiveAdmin.register Order do
     f.inputs do
       f.input :user
       f.input :total_amount
-      f.input :status
+      f.input :status, as: :select, collection: Order.statuses.keys.map { |status| [status.humanize, status] }
       f.has_many :order_items, allow_destroy: true do |item|
         item.input :product
         item.input :quantity

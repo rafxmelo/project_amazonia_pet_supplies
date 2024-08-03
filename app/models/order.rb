@@ -1,3 +1,4 @@
+# app/models/order.rb
 class Order < ApplicationRecord
   belongs_to :user
   belongs_to :province, optional: true
@@ -6,8 +7,7 @@ class Order < ApplicationRecord
 
   validates :total_amount, :status, presence: true
 
-  # Add the province_id attribute to your order model
-  belongs_to :province, optional: true
+  enum status: { new_order: 0, paid_order: 1, shipped: 2 }
 
   def add_items_from_cart(cart)
     cart.each do |id, quantity|

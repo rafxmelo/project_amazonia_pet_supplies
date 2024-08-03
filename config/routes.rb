@@ -52,6 +52,9 @@ Rails.application.routes.draw do
 
   resources :orders, only: [:index, :new, :create, :show] do
     post 'recalculate_total', on: :collection
+    member do
+      patch 'confirm_payment'
+    end
   end
 
 

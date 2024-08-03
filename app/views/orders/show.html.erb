@@ -1,7 +1,8 @@
+<!-- app/views/orders/show.html.erb -->
 <h1>Order Details</h1>
 
 <p><strong>Order ID:</strong> <%= @order.id %></p>
-<p><strong>Status:</strong> <%= @order.status %></p>
+<p><strong>Status:</strong> <%= @order.status.humanize %></p>
 
 <h2>Order Items</h2>
 <ul>

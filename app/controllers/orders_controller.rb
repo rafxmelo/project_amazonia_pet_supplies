@@ -1,3 +1,4 @@
+# app/controllers/orders_controller.rb
 class OrdersController < ApplicationController
   before_action :authenticate_user!
   before_action :ensure_user_has_province, only: [:new, :create]
@@ -24,7 +25,7 @@ class OrdersController < ApplicationController
   def create
     @order = current_user.orders.build(order_params)
     @order.add_items_from_cart(session[:cart])
-    @order.status = 'pending' # Set a default status
+    @order.status = :new_order  # Set a default status
     Rails.logger.debug "Order before saving: #{@order.inspect}"
     if @order.save
       session[:cart] = {}
@@ -53,7 +54,26 @@ class OrdersController < ApplicationController
     @order = current_user.orders.find(params[:id])
   end
 
+  def confirm_payment
+    @order = Order.find(params[:id])
+
+    # Simulate payment confirmation from a third-party processor
+    if payment_successful?(@order)
+      @order.update(status: :paid_order)
+      flash[:notice] = "Payment confirmed and order marked as paid."
+    else
+      flash[:alert] = "Payment confirmation failed."
+    end
+
+    redirect_to @order
+  end
+
   private
+
+  def payment_successful?(order)
+    # Simulate checking with a payment processor
+    true
+  end
 
   def order_params
     params.require(:order).permit(:total_amount, :status, :province_id, order_items_attributes: [:product_id, :quantity, :price])

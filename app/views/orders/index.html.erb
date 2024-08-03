@@ -17,7 +17,7 @@
         <tr>
           <td><%= order.id %></td>
           <td><%= number_to_currency(order.total_amount) %></td>
-          <td><%= order.status %></td>
+          <td><%= order.status.humanize %></td>
           <td><%= order.created_at.strftime("%Y-%m-%d") %></td>
           <td><%= link_to 'View', order_path(order) %></td>
         </tr>
