@@ -1,7 +1,6 @@
 <h1>Order Details</h1>
 
 <p><strong>Order ID:</strong> <%= @order.id %></p>
-<p><strong>Total Amount:</strong> <%= number_to_currency(@order.total_amount) %></p>
 <p><strong>Status:</strong> <%= @order.status %></p>
 
 <h2>Order Items</h2>
@@ -12,3 +11,10 @@
     </li>
   <% end %>
 </ul>
+
+<h2>Taxes</h2>
+<p><strong>GST:</strong> <%= number_to_currency(@order.total_amount * @order.user.province.gst / 100.0) %></p>
+<p><strong>PST:</strong> <%= number_to_currency(@order.total_amount * @order.user.province.pst / 100.0) %></p>
+<p><strong>QST:</strong> <%= number_to_currency(@order.total_amount * @order.user.province.qst / 100.0) %></p>
+
+<p><strong>Grand Total:</strong> <%= number_to_currency(@order.total_amount) %></p>

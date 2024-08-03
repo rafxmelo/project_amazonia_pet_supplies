@@ -1,45 +1,39 @@
 ActiveAdmin.register Order do
-  permit_params :status, :province_id, order_items_attributes: [:id, :product_id, :quantity, :price, :_destroy]
-
-  filter :province, as: :select, collection: -> { Province.all.pluck(:name, :id) }
-  filter :status
+  permit_params :status, :user_id, :total_amount, order_items_attributes: [:id, :product_id, :quantity, :price, :_destroy]
 
   index do
     selectable_column
     id_column
-    column :user
-    column :province
-    column :total_amount
+    column :user do |order|
+      order.user.username
+    end
+    column "Products" do |order|
+      order.order_items.map { |item| item.product.name }.join(", ")
+    end
+    column "Taxes" do |order|
+      gst = order.total_amount * order.user.province.gst / 100.0
+      pst = order.total_amount * order.user.province.pst / 100.0
+      qst = order.total_amount * order.user.province.qst / 100.0
+      "GST: #{number_to_currency(gst)}, PST: #{number_to_currency(pst)}, QST: #{number_to_currency(qst)}"
+    end
+    column :total_amount do |order|
+      number_to_currency(order.total_amount)
+    end
     column :status
     column :created_at
     column :updated_at
-    column "Order Items" do |order|
-      ul do
-        order.order_items.each do |item|
-          li "#{item.product.name} (Quantity: #{item.quantity}, Price: #{item.price})"
-        end
-      end
-    end
     actions
   end
 
-  form do |f|
-    f.inputs do
-      f.input :status
-      f.input :province, as: :select, collection: Province.all.pluck(:name, :id)
-      f.has_many :order_items, allow_destroy: true do |item|
-        item.input :product
-        item.input :quantity
-        item.input :price
-      end
-    end
-    f.actions
-  end
+  filter :user
+  filter :total_amount
+  filter :status
+  filter :created_at
+  filter :updated_at
 
   show do
     attributes_table do
       row :user
-      row :province
       row :total_amount
       row :status
       row :created_at
@@ -48,16 +42,35 @@ ActiveAdmin.register Order do
 
     panel "Order Items" do
       table_for order.order_items do
-        column "Product" do |item|
-          item.product.name
-        end
-        column "Quantity" do |item|
-          item.quantity
-        end
-        column "Price" do |item|
-          item.price
-        end
+        column :product
+        column :quantity
+        column :price
       end
     end
+
+    panel "Taxes" do
+      gst = order.total_amount * order.user.province.gst / 100.0
+      pst = order.total_amount * order.user.province.pst / 100.0
+      qst = order.total_amount * order.user.province.qst / 100.0
+      "GST: #{number_to_currency(gst)}, PST: #{number_to_currency(pst)}, QST: #{number_to_currency(qst)}"
+    end
+
+    panel "Grand Total" do
+      number_to_currency(order.total_amount)
+    end
+  end
+
+  form do |f|
+    f.inputs do
+      f.input :user
+      f.input :total_amount
+      f.input :status
+      f.has_many :order_items, allow_destroy: true do |item|
+        item.input :product
+        item.input :quantity
+        item.input :price
+      end
+    end
+    f.actions
   end
 end
