@@ -35,8 +35,9 @@ class PaymentsController < ApplicationController
   end
 
   def confirm
-    if params[:use_stripe] == 'true'
-      @order = Order.find(params[:order_id])
+    @order = Order.find(params[:order_id]) # Ensure the order is retrieved
+
+    if params[:use_stripe] == true
       payment_id = params[:payment_id]
       payment_intent = Stripe::PaymentIntent.retrieve(payment_id)
 
@@ -46,6 +47,10 @@ class PaymentsController < ApplicationController
       else
         flash[:alert] = 'Payment confirmation failed.'
       end
+    else
+      # Proceed without payment
+
+      flash[:notice] = 'Order confirmed without payment.'
     end
 
     redirect_to order_path(@order)

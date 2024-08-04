@@ -47,7 +47,7 @@ class Order < ApplicationRecord
   before_save :calculate_total_amount
 
   def self.ransackable_attributes(auth_object = nil)
-    ["created_at", "id", "status", "total_amount", "updated_at", "user_id"]
+    ["created_at", "id", "status", "total_amount", "updated_at", "user_id","payment_intent_id"]
   end
 
   def self.ransackable_associations(auth_object = nil)

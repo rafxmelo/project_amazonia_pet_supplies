@@ -86,7 +86,7 @@
                 'Content-Type': 'application/json',
                 'X-CSRF-Token': '<%= form_authenticity_token %>'
               },
-              body: JSON.stringify({ payment_id: paymentIntent.id })
+              body: JSON.stringify({ payment_id: paymentIntent.id, use_stripe: true })
             });
 
             if (response.ok) {
@@ -107,7 +107,8 @@
             headers: {
               'Content-Type': 'application/json',
               'X-CSRF-Token': '<%= form_authenticity_token %>'
-            }
+            },
+            body: JSON.stringify({ use_stripe: false }) // Include use_stripe
           });
 
           if (response.ok) {

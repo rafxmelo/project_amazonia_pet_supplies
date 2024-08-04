@@ -1,6 +1,7 @@
 # app/admin/orders.rb
+
 ActiveAdmin.register Order do
-  permit_params :status, :user_id, :total_amount, order_items_attributes: [:id, :product_id, :quantity, :price, :_destroy]
+  permit_params :status, :user_id, :total_amount, :payment_intent_id, order_items_attributes: [:id, :product_id, :quantity, :price, :_destroy]
 
   index do
     selectable_column
@@ -24,6 +25,7 @@ ActiveAdmin.register Order do
       status = order.status&.humanize || 'Unknown'
       status_tag(status, class: order.status || 'unknown')
     end
+    column :payment_intent_id  # New column for payment_intent_id
     column :created_at
     column :updated_at
     actions
@@ -34,6 +36,7 @@ ActiveAdmin.register Order do
   filter :status, as: :select, collection: Order.statuses.keys
   filter :created_at
   filter :updated_at
+  filter :payment_intent_id # Filter for payment_intent_id
 
   show do
     attributes_table do
@@ -42,6 +45,7 @@ ActiveAdmin.register Order do
       row :status do |order|
         order.status&.humanize || 'Unknown'
       end
+      row :payment_intent_id # Row for payment_intent_id
       row :created_at
       row :updated_at
     end
@@ -71,6 +75,7 @@ ActiveAdmin.register Order do
       f.input :user
       f.input :total_amount
       f.input :status, as: :select, collection: Order.statuses.keys.map { |status| [status.humanize, status] }
+      f.input :payment_intent_id, input_html: { readonly: true } # Add payment_intent_id as readonly
       f.has_many :order_items, allow_destroy: true do |item|
         item.input :product
         item.input :quantity
