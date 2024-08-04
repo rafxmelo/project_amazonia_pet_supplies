@@ -55,6 +55,9 @@ Rails.application.routes.draw do
     member do
       patch 'confirm_payment'
     end
+    resources :payments, only: [:new, :create] do
+      post 'confirm', on: :collection
+    end
   end
 
 

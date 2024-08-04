@@ -1,12 +1,13 @@
+<!-- app/views/orders/new.html.erb -->
 <h1>Checkout</h1>
 <%= form_with model: @order, local: true, id: 'order_form' do |form| %>
   <div>
-    <%= form.label :user_name, "Name" %>
-    <%= form.text_field :user_name, value: current_user.username, readonly: true %>
+    <%= form.label :recipient_name, "Recipient Name" %>
+    <%= form.text_field :recipient_name, value: current_user.username %>
   </div>
   <div>
-    <%= form.label :address %>
-    <%= form.text_field :address, value: current_user.address, readonly: true %>
+    <%= form.label :recipient_address, "Recipient Address" %>
+    <%= form.text_field :recipient_address, value: current_user.address %>
   </div>
   <div>
     <%= form.label :province %>

@@ -3,7 +3,13 @@
 
 <p><strong>Order ID:</strong> <%= @order.id %></p>
 <p><strong>Status:</strong> <%= @order.status.humanize %></p>
-
+<% if session[:recipient_name] %>
+<h2>Recipient Details</h2>
+<ul>
+  <li><strong>Recipient Name:</strong> <%= session[:recipient_name] %></li>
+  <li><strong>Recipient Address:</strong> <%= session[:recipient_address] %></li>
+</ul>
+<% end %>
 <h2>Order Items</h2>
 <ul>
   <% @order.order_items.each do |item| %>
@@ -19,3 +25,9 @@
 <p><strong>QST:</strong> <%= number_to_currency(@order.total_amount * @order.user.province.qst / 100.0) %></p>
 
 <p><strong>Grand Total:</strong> <%= number_to_currency(@order.total_amount) %></p>
+
+<% if @order.new_order? %>
+  <h3>Payment Options</h3>
+  <p>This order is pending payment. Please choose one of the following payment options:</p>
+  <%= link_to 'Proceed to Payment', new_order_payment_path(@order, use_stripe: true), class: 'button' %>
+<% end %>

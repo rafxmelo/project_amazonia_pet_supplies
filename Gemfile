@@ -27,6 +27,8 @@ gem 'activestorage', '~> 7.1.3'
 gem 'image_processing', '~> 1.2'
 gem 'ruby-vips','2.2.2'
 gem 'mini_magick', '~> 4.10'
+gem 'stripe'
+gem 'dotenv-rails', groups: [:development, :test]
 
 group :development, :test do
   gem "debug", platforms: %i[ mri mswin mswin64 mingw x64_mingw ]

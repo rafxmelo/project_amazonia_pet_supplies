@@ -7,6 +7,10 @@ class ChangeStatusTypeInOrders < ActiveRecord::Migration[6.1]
     Order.where(status: nil).update_all(status: 0) # Set to :new_order as default
   end
 
+  def change
+    change_column :orders, :status, :integer, default: 0, null: false
+  end
+
   def down
     # Revert the changes if necessary
     change_column :orders, :status, :string

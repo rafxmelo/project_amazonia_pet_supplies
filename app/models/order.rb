@@ -6,8 +6,16 @@ class Order < ApplicationRecord
   accepts_nested_attributes_for :order_items
 
   validates :total_amount, :status, presence: true
+  validates :payment_intent_id, presence: true, if: :stripe_payment?
 
   enum status: { new_order: 0, paid_order: 1, shipped: 2 }
+
+  # Serialize metadata to store additional data like user_name and address
+  store :metadata, accessors: [:recipient_name, :recipient_address], coder: JSON
+
+  def needs_payment?
+    status == "new_order" && !payment_intent_id
+  end
 
   def add_items_from_cart(cart)
     cart.each do |id, quantity|
@@ -30,6 +38,10 @@ class Order < ApplicationRecord
     qst = subtotal * (province.qst / 100.0)
     self.total_amount = subtotal + gst + pst + qst
     Rails.logger.debug "Calculated total amount: #{self.total_amount}"
+  end
+
+  def stripe_payment?
+    payment_intent_id.present?
   end
 
   before_save :calculate_total_amount

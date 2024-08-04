@@ -29,3 +29,7 @@
 
 en:
   hello: "Hello world"
+  activerecord:
+    attributes:
+      user:
+        postal_code: "ZIP Code"

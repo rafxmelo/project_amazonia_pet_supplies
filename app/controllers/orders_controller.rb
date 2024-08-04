@@ -30,7 +30,7 @@ class OrdersController < ApplicationController
     if @order.save
       session[:cart] = {}
       flash[:notice] = 'Order placed successfully'
-      redirect_to @order, notice: 'Order was successfully created.'
+      redirect_to new_order_payment_path(@order) # Redirect to payment page
     else
       Rails.logger.debug "Order save failed: #{@order.errors.full_messages}"
       flash[:alert] = 'Failed to place the order. Please try again.'
@@ -54,29 +54,10 @@ class OrdersController < ApplicationController
     @order = current_user.orders.find(params[:id])
   end
 
-  def confirm_payment
-    @order = Order.find(params[:id])
-
-    # Simulate payment confirmation from a third-party processor
-    if payment_successful?(@order)
-      @order.update(status: :paid_order)
-      flash[:notice] = "Payment confirmed and order marked as paid."
-    else
-      flash[:alert] = "Payment confirmation failed."
-    end
-
-    redirect_to @order
-  end
-
   private
 
-  def payment_successful?(order)
-    # Simulate checking with a payment processor
-    true
-  end
-
   def order_params
-    params.require(:order).permit(:total_amount, :status, :province_id, order_items_attributes: [:product_id, :quantity, :price])
+    params.require(:order).permit(:total_amount, :status, :province_id, :recipient_name, :recipient_address, order_items_attributes: [:product_id, :quantity, :price])
   end
 
   def ensure_user_has_province

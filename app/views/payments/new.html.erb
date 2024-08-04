@@ -1,0 +1,141 @@
+<!-- app/views/payments/new.html.erb -->
+<h1>Checkout</h1>
+
+<p>Order ID: <%= @order.id %></p>
+<p>Total Amount: <%= number_to_currency(@order.total_amount) %></p>
+
+<%= form_with url: order_payments_path(@order), method: :post, local: true, id: 'payment-form' do %>
+  <div id="payment-options">
+    <p>Please select your payment option:</p>
+    <label>
+      <%= radio_button_tag 'use_stripe', 'true', params[:use_stripe] == 'true' %>
+      Pay with Stripe
+    </label>
+    <label>
+      <%= radio_button_tag 'use_stripe', 'false', params[:use_stripe] != 'true' %>
+      Proceed without Payment
+    </label>
+  </div>
+
+  <div id="stripe-payment" style="display: none; max-width: 30%">
+    <div id="card-element"><!-- Stripe.js injects the Card Element --></div>
+    <div id="card-errors" role="alert" style="color: red;"></div> <!-- To show errors -->
+  </div>
+
+  <!-- Use a hidden field to pass the client_secret to JavaScript -->
+  <%= hidden_field_tag :client_secret, @client_secret, id: 'client-secret' %>
+
+  <%= submit_tag 'Confirm Order', id: 'confirm-button' %>
+<% end %>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Stripe with the publishable key
+    const stripe = Stripe('<%= Rails.configuration.stripe[:publishable_key] %>');
+    const elements = stripe.elements();
+    const cardElement = elements.create('card');
+    cardElement.mount('#card-element');
+
+    // Handle card errors
+    cardElement.on('change', ({ error }) => {
+      const displayError = document.getElementById('card-errors');
+      if (error) {
+        displayError.textContent = error.message;
+      } else {
+        displayError.textContent = '';
+      }
+    });
+
+    const form = document.getElementById('payment-form');
+    const stripePayment = document.getElementById('stripe-payment');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const useStripe = document.querySelector('input[name="use_stripe"]:checked').value;
+      if (useStripe === 'true') {
+        // Retrieve the client_secret from the hidden field
+        const clientSecret = document.getElementById('client-secret').value;
+
+        // Debug: Log the clientSecret to ensure it's not empty
+        console.log('Client Secret:', clientSecret);
+
+        // Ensure clientSecret is not empty before proceeding
+        if (!clientSecret) {
+          alert('Stripe client secret not available.');
+          return;
+        }
+
+        try {
+          // Confirm the card payment using the client secret
+          const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+            payment_method: {
+              card: cardElement
+            }
+          });
+
+          if (error) {
+            document.getElementById('card-errors').textContent = error.message;
+            console.error('Stripe Error:', error);
+          } else if (paymentIntent.status === 'succeeded') {
+            // Wait for the response to complete before proceeding
+            const response = await fetch('<%= confirm_order_payments_path(@order) %>', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': '<%= form_authenticity_token %>'
+              },
+              body: JSON.stringify({ payment_id: paymentIntent.id })
+            });
+
+            if (response.ok) {
+              window.location.href = '<%= order_path(@order) %>';
+            } else {
+              alert('Payment confirmation failed.');
+            }
+          }
+        } catch (e) {
+          console.error('Error during payment processing:', e);
+          alert('An unexpected error occurred. Please try again.');
+        }
+      } else {
+        // Proceed without payment
+        try {
+          const response = await fetch('<%= confirm_order_payments_path(@order) %>', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': '<%= form_authenticity_token %>'
+            }
+          });
+
+          if (response.ok) {
+            window.location.href = '<%= order_path(@order) %>';
+          } else {
+            alert('Order confirmation failed.');
+          }
+        } catch (e) {
+          console.error('Error during order confirmation:', e);
+          alert('An unexpected error occurred. Please try again.');
+        }
+      }
+    });
+
+    const radioButtons = document.querySelectorAll('input[name="use_stripe"]');
+    radioButtons.forEach(button => {
+      button.addEventListener('change', () => {
+        if (button.value === 'true') {
+          stripePayment.style.display = 'block';
+        } else {
+          stripePayment.style.display = 'none';
+        }
+      });
+    });
+
+    const initialPaymentOption = document.querySelector('input[name="use_stripe"]:checked').value;
+    if (initialPaymentOption === 'true') {
+      stripePayment.style.display = 'block';
+    }
+  });
+</script>
