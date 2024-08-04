@@ -9,6 +9,7 @@ class User < ApplicationRecord
   validates :address, presence: true, if: -> { province_id.present? }
   validates :username, :email, presence: true
   validates :email, uniqueness: true
+  validates :province_id, presence: true, on: :update
 
   def self.ransackable_attributes(auth_object = nil)
     ["address", "created_at", "email", "id", "province_id", "updated_at", "username"]

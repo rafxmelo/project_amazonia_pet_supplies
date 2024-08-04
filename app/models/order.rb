@@ -32,16 +32,38 @@ class Order < ApplicationRecord
   def calculate_total_amount
     subtotal = order_items.sum { |item| item.quantity * item.price }
     Rails.logger.debug "Subtotal: #{subtotal}"
-    province = user.province
-    gst = subtotal * (province.gst / 100.0)
-    pst = subtotal * (province.pst / 100.0)
-    qst = subtotal * (province.qst / 100.0)
+
+    # Fetch current tax rates
+    gst_rate = self.gst_rate || province&.gst || 0
+    pst_rate = self.pst_rate || province&.pst || 0
+    qst_rate = self.qst_rate || province&.qst || 0
+
+    # Log the tax rates to debug
+    Rails.logger.debug "GST Rate: #{gst_rate}, PST Rate: #{pst_rate}, QST Rate: #{qst_rate}"
+
+
+    # Use stored tax rates for the order
+    gst = subtotal * (gst_rate / 100.0)
+    pst = subtotal * (pst_rate / 100.0)
+    qst = subtotal * (qst_rate / 100.0)
+
     self.total_amount = subtotal + gst + pst + qst
     Rails.logger.debug "Calculated total amount: #{self.total_amount}"
   end
 
   def stripe_payment?
     payment_intent_id.present?
+  end
+
+  def set_current_tax_rates
+    # Set current tax rates from the user's province
+    if province.present?
+      self.gst_rate ||= province.gst || 0
+      self.pst_rate ||= province.pst || 0
+      self.qst_rate ||= province.qst || 0
+    else
+      Rails.logger.error "Province not set for order: #{self.id}"
+    end
   end
 
   before_save :calculate_total_amount

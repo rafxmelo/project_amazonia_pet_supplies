@@ -106,8 +106,9 @@ end
 
 ### app/admin/orders.rb ###
 # app/admin/orders.rb
+
 ActiveAdmin.register Order do
-  permit_params :status, :user_id, :total_amount, order_items_attributes: [:id, :product_id, :quantity, :price, :_destroy]
+  permit_params :status, :user_id, :total_amount, :payment_intent_id, order_items_attributes: [:id, :product_id, :quantity, :price, :_destroy]
 
   index do
     selectable_column
@@ -119,9 +120,9 @@ ActiveAdmin.register Order do
       order.order_items.map { |item| item.product.name }.join(", ")
     end
     column "Taxes" do |order|
-      gst = order.total_amount * order.user.province.gst / 100.0
-      pst = order.total_amount * order.user.province.pst / 100.0
-      qst = order.total_amount * order.user.province.qst / 100.0
+      gst = order.total_amount * (order.gst_rate / 100.0)
+      pst = order.total_amount * (order.pst_rate / 100.0)
+      qst = order.total_amount * (order.qst_rate / 100.0)
       "GST: #{number_to_currency(gst)}, PST: #{number_to_currency(pst)}, QST: #{number_to_currency(qst)}"
     end
     column :total_amount do |order|
@@ -130,6 +131,12 @@ ActiveAdmin.register Order do
     column :status do |order|
       status = order.status&.humanize || 'Unknown'
       status_tag(status, class: order.status || 'unknown')
+    end
+    column :payment_intent_id
+    column "Recipient Name", &:recipient_name
+    column "Recipient Address", &:recipient_address
+    column "Province" do |order|
+      order.province&.name || 'N/A'
     end
     column :created_at
     column :updated_at
@@ -141,6 +148,10 @@ ActiveAdmin.register Order do
   filter :status, as: :select, collection: Order.statuses.keys
   filter :created_at
   filter :updated_at
+  filter :payment_intent_id
+  filter :recipient_name
+  filter :recipient_address
+  filter :province, as: :select, collection: Province.pluck(:name, :id)
 
   show do
     attributes_table do
@@ -148,6 +159,12 @@ ActiveAdmin.register Order do
       row :total_amount
       row :status do |order|
         order.status&.humanize || 'Unknown'
+      end
+      row :payment_intent_id
+      row :recipient_name
+      row :recipient_address
+      row :province do |order|
+        order.province&.name || 'N/A'
       end
       row :created_at
       row :updated_at
@@ -162,9 +179,9 @@ ActiveAdmin.register Order do
     end
 
     panel "Taxes" do
-      gst = order.total_amount * order.user.province.gst / 100.0
-      pst = order.total_amount * order.user.province.pst / 100.0
-      qst = order.total_amount * order.user.province.qst / 100.0
+      gst = order.total_amount * (order.gst_rate / 100.0)
+      pst = order.total_amount * (order.pst_rate / 100.0)
+      qst = order.total_amount * (order.qst_rate / 100.0)
       "GST: #{number_to_currency(gst)}, PST: #{number_to_currency(pst)}, QST: #{number_to_currency(qst)}"
     end
 
@@ -178,6 +195,10 @@ ActiveAdmin.register Order do
       f.input :user
       f.input :total_amount
       f.input :status, as: :select, collection: Order.statuses.keys.map { |status| [status.humanize, status] }
+      f.input :payment_intent_id, input_html: { readonly: true }
+      f.input :recipient_name, input_html: { readonly: true }
+      f.input :recipient_address, input_html: { readonly: true }
+      f.input :province, input_html: { readonly: true }, collection: Province.pluck(:name, :id)
       f.has_many :order_items, allow_destroy: true do |item|
         item.input :product
         item.input :quantity
@@ -735,11 +756,14 @@ class OrdersController < ApplicationController
     @order = Order.new(user: current_user)
     if session[:cart].present?
       @order.add_items_from_cart(session[:cart])
+
       if params[:province_id].present?
         @order.user.province_id = params[:province_id]
+        @order.set_current_tax_rates
         @order.calculate_total_amount
       else
         @order.user.province_id = current_user.province_id if current_user.province_id.present?
+        @order.set_current_tax_rates
         @order.calculate_total_amount
       end
       Rails.logger.debug "Order items in new action: #{@order.order_items.inspect}"
@@ -750,6 +774,8 @@ class OrdersController < ApplicationController
     @order = current_user.orders.build(order_params)
     @order.add_items_from_cart(session[:cart])
     @order.status = :new_order  # Set a default status
+    @order.province = current_user.province
+    @order.set_current_tax_rates
     Rails.logger.debug "Order before saving: #{@order.inspect}"
     if @order.save
       session[:cart] = {}
@@ -767,6 +793,7 @@ class OrdersController < ApplicationController
     @order = Order.new(user: current_user)
     @order.add_items_from_cart(session[:cart]) if session[:cart].present?
     @order.user.province = province
+    @order.set_current_tax_rates
     @order.calculate_total_amount
 
     respond_to do |format|
@@ -781,7 +808,7 @@ class OrdersController < ApplicationController
   private
 
   def order_params
-    params.require(:order).permit(:total_amount, :status, :province_id, :user_name, :address, order_items_attributes: [:product_id, :quantity, :price])
+    params.require(:order).permit(:total_amount, :status, :province_id, :recipient_name, :recipient_address, order_items_attributes: [:product_id, :quantity, :price])
   end
 
   def ensure_user_has_province
@@ -789,7 +816,6 @@ class OrdersController < ApplicationController
       redirect_to edit_user_registration_path, alert: 'Please update your profile with your province before placing an order.'
     end
   end
-
 end
 
 
@@ -819,6 +845,7 @@ class PaymentsController < ApplicationController
           payment_intent = Stripe::PaymentIntent.create(
             amount: @amount,
             currency: 'usd',
+            payment_method_types: ['card'],
             metadata: { order_id: @order.id }
           )
           @order.update(payment_intent_id: payment_intent.id)
@@ -828,6 +855,7 @@ class PaymentsController < ApplicationController
 
         # Retrieve the client secret for client-side use
         @client_secret = payment_intent.client_secret
+        Rails.logger.debug "Client Secret payment controller: #{@client_secret}" # Debugging: Log the client_secret
       rescue Stripe::StripeError => e
         flash[:error] = e.message
         redirect_to new_order_payment_path(@order)
@@ -838,34 +866,31 @@ class PaymentsController < ApplicationController
     end
   end
 
-  def create
-    @order = Order.find(params[:order_id])
-
-    if payment_successful?(@order)
-      @order.update(status: :paid_order)
-      flash[:notice] = "Payment confirmed and order marked as paid."
-    else
-      flash[:alert] = "Payment confirmation failed."
-    end
-
-    redirect_to @order
-  end
-
   def confirm
-    @order = Order.find(params[:order_id])
-    # Update the order status to 'new_order' if proceeding without payment
-    if @order.update(status: :new_order)
-      flash[:notice] = "Order confirmed without payment."
+    @order = Order.find(params[:order_id]) # Ensure the order is retrieved
+
+    if params[:use_stripe] == true
+      payment_id = params[:payment_id]
+      payment_intent = Stripe::PaymentIntent.retrieve(payment_id)
+
+      if payment_intent.status == 'succeeded'
+        @order.update(status: :paid_order) # Update order status to 'paid_order'
+        flash[:notice] = 'Payment confirmed and order marked as paid.'
+      else
+        flash[:alert] = 'Payment confirmation failed.'
+      end
     else
-      flash[:alert] = "Order confirmation failed."
+      # Proceed without payment
+
+      flash[:notice] = 'Order confirmed without payment.'
     end
+
     redirect_to order_path(@order)
   end
 
   private
 
   def payment_successful?(order)
-    # Check with Stripe if the payment was successful
     if order.payment_intent_id.present?
       payment_intent = Stripe::PaymentIntent.retrieve(order.payment_intent_id)
       return payment_intent.status == 'succeeded'
@@ -1205,6 +1230,7 @@ end
 
 
 ### app/models/order.rb ###
+# app/models/order.rb
 class Order < ApplicationRecord
   belongs_to :user
   belongs_to :province, optional: true
@@ -1214,12 +1240,11 @@ class Order < ApplicationRecord
   validates :total_amount, :status, presence: true
   validates :payment_intent_id, presence: true, if: :stripe_payment?
 
-  # Add the province_id attribute to your order model
-  belongs_to :province, optional: true
-
   enum status: { new_order: 0, paid_order: 1, shipped: 2 }
 
-  # Optional: Allow payment to be non-stripe
+  # Serialize metadata to store additional data like user_name and address
+  store :metadata, accessors: [:recipient_name, :recipient_address], coder: JSON
+
   def needs_payment?
     status == "new_order" && !payment_intent_id
   end
@@ -1240,22 +1265,35 @@ class Order < ApplicationRecord
     subtotal = order_items.sum { |item| item.quantity * item.price }
     Rails.logger.debug "Subtotal: #{subtotal}"
     province = user.province
-    gst = subtotal * (province.gst / 100.0)
-    pst = subtotal * (province.pst / 100.0)
-    qst = subtotal * (province.qst / 100.0)
+    # Fetch current tax rates
+    gst_rate = gst_rate || province.gst
+    pst_rate = pst_rate || province.pst
+    qst_rate = qst_rate || province.qst
+
+    # Use stored tax rates for the order
+    gst = subtotal * (gst_rate / 100.0)
+    pst = subtotal * (pst_rate / 100.0)
+    qst = subtotal * (qst_rate / 100.0)
+
     self.total_amount = subtotal + gst + pst + qst
     Rails.logger.debug "Calculated total amount: #{self.total_amount}"
   end
 
   def stripe_payment?
-    # Return true if Stripe is being used for payment
     payment_intent_id.present?
+  end
+
+  def set_current_tax_rates
+    # Set current tax rates from the user's province
+    self.gst_rate ||= user.province.gst
+    self.pst_rate ||= user.province.pst
+    self.qst_rate ||= user.province.qst
   end
 
   before_save :calculate_total_amount
 
   def self.ransackable_attributes(auth_object = nil)
-    ["created_at", "id", "status", "total_amount", "updated_at", "user_id"]
+    ["created_at", "id", "status", "total_amount", "updated_at", "user_id","payment_intent_id"]
   end
 
   def self.ransackable_associations(auth_object = nil)
@@ -1369,6 +1407,7 @@ class User < ApplicationRecord
   validates :address, presence: true, if: -> { province_id.present? }
   validates :username, :email, presence: true
   validates :email, uniqueness: true
+  validates :province_id, presence: true, on: :update
 
   def self.ransackable_attributes(auth_object = nil)
     ["address", "created_at", "email", "id", "province_id", "updated_at", "username"]
@@ -2079,15 +2118,16 @@ end
 
 
 ### app/views/orders/new.html.erb ###
+<!-- app/views/orders/new.html.erb -->
 <h1>Checkout</h1>
 <%= form_with model: @order, local: true, id: 'order_form' do |form| %>
   <div>
-    <%= form.label :user_name, "Name" %>
-    <%= form.text_field :user_name, value: current_user.username, readonly: true %>
+    <%= form.label :recipient_name, "Recipient Name" %>
+    <%= form.text_field :recipient_name, value: current_user.username %>
   </div>
   <div>
-    <%= form.label :address %>
-    <%= form.text_field :address, value: current_user.address, readonly: true %>
+    <%= form.label :recipient_address, "Recipient Address" %>
+    <%= form.text_field :recipient_address, value: current_user.address %>
   </div>
   <div>
     <%= form.label :province %>
@@ -2129,7 +2169,13 @@ end
 
 <p><strong>Order ID:</strong> <%= @order.id %></p>
 <p><strong>Status:</strong> <%= @order.status.humanize %></p>
-
+<% if session[:recipient_name] %>
+<h2>Recipient Details</h2>
+<ul>
+  <li><strong>Recipient Name:</strong> <%= session[:recipient_name] %></li>
+  <li><strong>Recipient Address:</strong> <%= session[:recipient_address] %></li>
+</ul>
+<% end %>
 <h2>Order Items</h2>
 <ul>
   <% @order.order_items.each do |item| %>
@@ -2187,12 +2233,16 @@ end
     <div id="card-errors" role="alert" style="color: red;"></div> <!-- To show errors -->
   </div>
 
+  <!-- Use a hidden field to pass the client_secret to JavaScript -->
+  <%= hidden_field_tag :client_secret, @client_secret, id: 'client-secret' %>
+
   <%= submit_tag 'Confirm Order', id: 'confirm-button' %>
 <% end %>
 
 <script src="https://js.stripe.com/v3/"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Stripe with the publishable key
     const stripe = Stripe('<%= Rails.configuration.stripe[:publishable_key] %>');
     const elements = stripe.elements();
     const cardElement = elements.create('card');
@@ -2216,15 +2266,20 @@ end
 
       const useStripe = document.querySelector('input[name="use_stripe"]:checked').value;
       if (useStripe === 'true') {
-        const clientSecret = '<%= @client_secret %>';
+        // Retrieve the client_secret from the hidden field
+        const clientSecret = document.getElementById('client-secret').value;
 
+        // Debug: Log the clientSecret to ensure it's not empty
+        console.log('Client Secret:', clientSecret);
+
+        // Ensure clientSecret is not empty before proceeding
         if (!clientSecret) {
           alert('Stripe client secret not available.');
           return;
         }
 
         try {
-          // Attempt to confirm card payment
+          // Confirm the card payment using the client secret
           const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
             payment_method: {
               card: cardElement
@@ -2232,18 +2287,17 @@ end
           });
 
           if (error) {
-            // Display error message to the user
             document.getElementById('card-errors').textContent = error.message;
             console.error('Stripe Error:', error);
           } else if (paymentIntent.status === 'succeeded') {
-            // Send payment success to the server
+            // Wait for the response to complete before proceeding
             const response = await fetch('<%= confirm_order_payments_path(@order) %>', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-Token': '<%= form_authenticity_token %>'
               },
-              body: JSON.stringify({ payment_id: paymentIntent.id })
+              body: JSON.stringify({ payment_id: paymentIntent.id, use_stripe: true })
             });
 
             if (response.ok) {
@@ -2264,7 +2318,8 @@ end
             headers: {
               'Content-Type': 'application/json',
               'X-CSRF-Token': '<%= form_authenticity_token %>'
-            }
+            },
+            body: JSON.stringify({ use_stripe: false }) // Include use_stripe
           });
 
           if (response.ok) {
@@ -2279,7 +2334,6 @@ end
       }
     });
 
-    // Handle radio button changes to toggle payment form visibility
     const radioButtons = document.querySelectorAll('input[name="use_stripe"]');
     radioButtons.forEach(button => {
       button.addEventListener('change', () => {
@@ -2291,7 +2345,6 @@ end
       });
     });
 
-    // Set initial visibility of the stripe payment form
     const initialPaymentOption = document.querySelector('input[name="use_stripe"]:checked').value;
     if (initialPaymentOption === 'true') {
       stripePayment.style.display = 'block';
@@ -4580,6 +4633,26 @@ end
 class AddPaymentIntentIdToOrders < ActiveRecord::Migration[7.1]
   def change
     add_column :orders, :payment_intent_id, :string
+  end
+end
+
+
+
+### db/migrate/20240804013204_add_metadata_to_orders.rb ###
+class AddMetadataToOrders < ActiveRecord::Migration[7.1]
+  def change
+    add_column :orders, :metadata, :text
+  end
+end
+
+
+
+### db/migrate/20240804051524_add_tax_rates_to_orders.rb ###
+class AddTaxRatesToOrders < ActiveRecord::Migration[7.1]
+  def change
+    add_column :orders, :gst_rate, :decimal, precision: 5, scale: 2
+    add_column :orders, :pst_rate, :decimal, precision: 5, scale: 2
+    add_column :orders, :qst_rate, :decimal, precision: 5, scale: 2
   end
 end
 

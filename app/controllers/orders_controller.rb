@@ -11,22 +11,32 @@ class OrdersController < ApplicationController
     @order = Order.new(user: current_user)
     if session[:cart].present?
       @order.add_items_from_cart(session[:cart])
+
       if params[:province_id].present?
-        @order.user.province_id = params[:province_id]
-        @order.calculate_total_amount
+        @order.province_id = params[:province_id]
       else
-        @order.user.province_id = current_user.province_id if current_user.province_id.present?
-        @order.calculate_total_amount
+        @order.province_id = current_user.province_id if current_user.province_id.present?
       end
+
+      @order.set_current_tax_rates
+      @order.calculate_total_amount
+
       Rails.logger.debug "Order items in new action: #{@order.order_items.inspect}"
     end
   end
+
 
   def create
     @order = current_user.orders.build(order_params)
     @order.add_items_from_cart(session[:cart])
     @order.status = :new_order  # Set a default status
+
+    # Ensure province is set
+    @order.province = Province.find(order_params[:province_id])
+    @order.set_current_tax_rates
+
     Rails.logger.debug "Order before saving: #{@order.inspect}"
+
     if @order.save
       session[:cart] = {}
       flash[:notice] = 'Order placed successfully'
@@ -42,7 +52,8 @@ class OrdersController < ApplicationController
     province = Province.find(params[:province_id])
     @order = Order.new(user: current_user)
     @order.add_items_from_cart(session[:cart]) if session[:cart].present?
-    @order.user.province = province
+    @order.province = province
+    @order.set_current_tax_rates
     @order.calculate_total_amount
 
     respond_to do |format|
