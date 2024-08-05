@@ -26,7 +26,7 @@
 <div class="row">
   <% @products.each do |product| %>
     <div class="col-md-4 mb-4">
-      <%= render partial: "product", locals: { product: product } %>
+      <%= render partial: "products/product", locals: { product: product } %>
     </div>
   <% end %>
 </div>

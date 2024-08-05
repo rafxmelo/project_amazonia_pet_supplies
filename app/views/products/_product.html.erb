@@ -1,3 +1,4 @@
+<!-- app/views/products/_product.html.erb -->
 <div class="product card h-100">
   <% if product.image.attached? %>
     <%= image_tag product.image.variant(resize_to_limit: [300, 300]), class: 'card-img-top' %>
