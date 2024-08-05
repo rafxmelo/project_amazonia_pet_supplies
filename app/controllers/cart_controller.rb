@@ -18,11 +18,12 @@ class CartController < ApplicationController
   def add
     id = params[:id].to_s
     cart = session[:cart] || {}
-    cart[id] ? cart[id] += 1 : cart[id] = 1
+    cart[id] = (cart[id] || 0) + 1
     session[:cart] = cart
     Rails.logger.debug "Cart after add: #{session[:cart].inspect}"
     redirect_to cart_path
   end
+
 
   def update
     cart_params = cart_update_params
@@ -48,11 +49,10 @@ class CartController < ApplicationController
     end
 
     session[:cart] = cart
-
     Rails.logger.debug "Cart after update: #{session[:cart].inspect}"
-
     redirect_to cart_path
   end
+
 
   def remove
     cart_params = cart_remove_params

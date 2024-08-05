@@ -4,7 +4,7 @@ class OrdersController < ApplicationController
   before_action :ensure_user_has_province, only: [:new, :create]
 
   def index
-    @orders = current_user.orders
+    @orders = current_user.orders.order(created_at: :desc)
   end
 
   def new

@@ -1,8 +1,7 @@
-<!-- app/views/orders/index.html.erb -->
 <h1>Your Orders</h1>
 
 <% if @orders.any? %>
-  <table>
+  <table class="table table-striped">
     <thead>
       <tr>
         <th>Order ID</th>
@@ -19,7 +18,7 @@
           <td><%= number_to_currency(order.total_amount) %></td>
           <td><%= order.status.humanize %></td>
           <td><%= order.created_at.strftime("%Y-%m-%d") %></td>
-          <td><%= link_to 'View', order_path(order) %></td>
+          <td><%= link_to 'View', order_path(order), class: 'btn btn-primary btn-sm' %></td>
         </tr>
       <% end %>
     </tbody>

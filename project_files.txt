@@ -469,6 +469,91 @@ document.addEventListener("DOMContentLoaded", function() {
 ### app/assets/javascripts/application.js ###
 //= require rails-ujs
 //= require activeadmin/quill_editor/quill_editor
+//= require bootstrap
+
+
+### app/assets/stylesheets/active_admin/active_admin_overrides.scss ###
+// app/assets/stylesheets/active_admin/active_admin_overrides.scss
+
+// Import the original active_admin styles
+@import 'active_admin/base';
+
+body.active_admin {
+  font-size: 14px;  // Adjust base font size
+
+  // Customize header
+  #header h1 {
+    font-size: 1.5rem;  // Adjust font size for headers
+  }
+
+  // Customize sidebar
+  #sidebar {
+    font-size: 0.9rem;
+  }
+
+  // Customize table elements
+  table.index_table {
+    font-size: 0.9rem;  // Standard table font size
+
+    th {
+      font-weight: bold;
+      font-size: 1rem;  // Slightly larger for headers
+    }
+
+    td {
+      word-wrap: break-word;  // Prevent overflow of text
+    }
+  }
+
+  // Form inputs and labels
+  form {
+    label {
+      font-weight: 600;
+    }
+
+    input, select, textarea {
+      font-size: 0.9rem;
+    }
+  }
+
+  // Buttons
+  .action_items .action_item a {
+    font-size: 0.85rem;  // Slightly smaller buttons
+    padding: 6px 12px;  // Adjust padding for consistency
+  }
+
+  // Pagination
+  .pagination {
+    font-size: 0.85rem;
+  }
+
+  // Other specific components
+  .flash, .filters_sidebar_section {
+    font-size: 0.9rem;
+  }
+}
+
+// Specific customizations for other elements
+.panel {
+  h3 {
+    font-size: 1.25rem;
+  }
+}
+
+.admin-orders-show {
+  h2, h3 {
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+  }
+
+  p, ul {
+    font-size: 0.95rem;
+  }
+
+  .page-item.active {
+    font-weight: bold;
+  }
+}
 
 
 
@@ -484,19 +569,36 @@ document.addEventListener("DOMContentLoaded", function() {
 @import "active_admin/mixins";
 @import "active_admin/base";
 @import "active_admin/quill_editor/quill_editor";
+@import "active_admin/active_admin_overrides";
 
 
+### app/assets/stylesheets/application.scss ###
+// Import Bootstrap
+@import "bootstrap";
 
-### app/assets/stylesheets/application.css ###
+// Variables
+$primary-color: #3498db;
+$secondary-color: #2980b9;
+$font-stack: 'Arial', sans-serif;
 
+// Body styling
 body {
-  font-family: Arial, sans-serif;
-}
-
-h1 {
+  font-family: $font-stack;
   color: #2c3e50;
+  background-color: #f8f9fa;
+  font-size: 14px;
+  .container {
+    margin-top: 20px;
+  }
 }
 
+// Header styles
+h1 {
+  color: $primary-color;
+  margin-bottom: 20px;
+}
+
+// List styling
 ul {
   list-style-type: none;
   padding: 0;
@@ -506,44 +608,137 @@ li {
   margin: 10px 0;
 }
 
-img {
-  max-width: 100px;
-  height: auto;
-  display: block;
-  margin-bottom: 10px;
-}
-
+// Button styling
 .btn {
-  background-color: #3498db;
+  background-color: $primary-color;
   color: white;
   padding: 10px 20px;
   text-decoration: none;
   border-radius: 5px;
+  border: none;
+
+  &:hover {
+    background-color: $secondary-color;
+    color: white;
+  }
 }
 
-.btn-primary {
-  background-color: #2980b9;
-}
-
-.btn:hover {
-  background-color: #2980b9;
-  color: white;
-}
 .alert {
   padding: 15px;
   margin-bottom: 20px;
   border: 1px solid transparent;
   border-radius: 4px;
+
+  &.alert-danger {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+  }
+
+  &.alert-success {
+    color: #3c763d;
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+  }
 }
-.alert-danger {
-  color: #a94442;
-  background-color: #f2dede;
-  border-color: #ebccd1;
+
+// Image styling
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin-bottom: 10px;
 }
-.alert-success {
-  color: #3c763d;
-  background-color: #dff0d8;
-  border-color: #d6e9c6;
+
+// Navbar styling
+.navbar {
+  margin-bottom: 20px;
+
+  .nav-link {
+    color: #fff !important;
+
+    &:hover {
+      color: $secondary-color !important;
+    }
+  }
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+h1 {
+  font-size: 2rem; /* Adjust as necessary */
+}
+
+h2 {
+  font-size: 1.75rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+}
+
+th, td {
+  font-size: 1rem; /* Consistent table font size */
+  word-break: break-word; /* Prevents text overflow */
+}
+
+.btn {
+  font-size: 0.875rem; /* Smaller font size for buttons */
+}
+
+.admin-dashboard .panel-heading {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.admin-dashboard .panel-body {
+  font-size: 1rem;
+}
+@media (max-width: 1200px) {
+  body {
+    font-size: 13px; /* Adjust for smaller screens */
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  h2 {
+    font-size: 1.6rem;
+  }
+
+  h3 {
+    font-size: 1.4rem;
+  }
+
+  th, td {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: 12px;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+  }
+
+  th, td {
+    font-size: 0.8rem;
+  }
 }
 
 
@@ -1150,7 +1345,8 @@ Rails.start()
 
 import "@hotwired/turbo-rails"
 import "controllers"
-
+import 'bootstrap'
+import '../stylesheets/application'
 
 
 ### app/javascript/controllers/application.js ###
@@ -1196,7 +1392,8 @@ eagerLoadControllersFrom("controllers", application)
 import Rails from "@rails/ujs"
 Rails.start()
 
-
+import 'bootstrap'
+import '../stylesheets/application'
 
 
 ### app/jobs/application_job.rb ###
@@ -1276,6 +1473,23 @@ class Order < ApplicationRecord
 
   # Serialize metadata to store additional data like user_name and address
   store :metadata, accessors: [:recipient_name, :recipient_address], coder: JSON
+
+  def gst_rate
+    super || 0.0
+  end
+
+  def pst_rate
+    super || 0.0
+  end
+
+  def qst_rate
+    super || 0.0
+  end
+
+  def hst_rate
+    super || 0.0
+  end
+
 
   def needs_payment?
     status == "new_order" && !payment_intent_id
@@ -1537,28 +1751,28 @@ end
 
 
 ### app/views/admin_users/sessions/new.html.erb ###
-<h2>Admin Log in</h2>
+<h2 class="text-center">Admin Log in</h2>
 
-<%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
-  <div class="field">
-    <%= f.label :email %><br />
-    <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+<%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: 'form-horizontal' }) do |f| %>
+  <div class="mb-3">
+    <%= f.label :email, class: 'form-label' %>
+    <%= f.email_field :email, autofocus: true, autocomplete: "email", class: 'form-control' %>
   </div>
 
-  <div class="field">
-    <%= f.label :password %><br />
-    <%= f.password_field :password, autocomplete: "current-password" %>
+  <div class="mb-3">
+    <%= f.label :password, class: 'form-label' %>
+    <%= f.password_field :password, autocomplete: "current-password", class: 'form-control' %>
   </div>
 
   <% if devise_mapping.rememberable? %>
-    <div class="field">
-      <%= f.check_box :remember_me %>
-      <%= f.label :remember_me %>
+    <div class="form-check mb-3">
+      <%= f.check_box :remember_me, class: 'form-check-input' %>
+      <%= f.label :remember_me, class: 'form-check-label' %>
     </div>
   <% end %>
 
-  <div class="actions">
-    <%= f.submit "Log in" %>
+  <div class="d-grid">
+    <%= f.submit "Log in", class: 'btn btn-primary' %>
   </div>
 <% end %>
 
@@ -1575,9 +1789,8 @@ end
 
 
 ### app/views/cart/show.html.erb ###
-<!-- app/views/cart/show.html.erb -->
 <h1>Your Shopping Cart</h1>
-<table>
+<table class="table">
   <thead>
     <tr>
       <th>Product</th>
@@ -1593,41 +1806,45 @@ end
         <tr>
           <td><%= item[:product].name %></td>
           <td>
-             <%= form_with url: update_cart_path(item[:product].id), method: :patch, local: true do |f| %>
+            <%= form_with url: update_cart_path(item[:product].id), method: :patch, local: true do |f| %>
               <%= f.hidden_field :id, value: item[:product].id %>
-              <%= f.number_field :quantity, value: item[:quantity], min: 1 %>
-              <%= f.submit "Update" %>
+              <%= f.number_field :quantity, value: item[:quantity], min: 1, class: 'form-control' %>
+              <%= f.submit "Update", class: 'btn btn-secondary btn-sm' %>
             <% end %>
           </td>
           <td><%= number_to_currency(item[:product].price) %></td>
           <td><%= number_to_currency(item[:product].price * item[:quantity]) %></td>
-
-  <td> <%= button_to "Remove", remove_from_cart_path(item[:product].id), method: :delete, data: { confirm: "Are you sure?" } %></td>
+          <td>
+            <%= button_to "Remove", remove_from_cart_path(item[:product].id), method: :delete, data: { confirm: "Are you sure?" }, class: 'btn btn-danger btn-sm' %>
+          </td>
         </tr>
       <% end %>
     <% else %>
       <tr>
-        <td colspan="5">Your cart is empty.</td>
+        <td colspan="5" class="text-center">Your cart is empty.</td>
       </tr>
     <% end %>
   </tbody>
 </table>
-<%= link_to 'Continue Shopping', root_path %>
-<%= link_to 'Checkout', new_order_path %>
+
+<div class="d-flex justify-content-between">
+  <%= link_to 'Continue Shopping', root_path, class: 'btn btn-primary' %>
+  <%= link_to 'Checkout', new_order_path, class: 'btn btn-success' %>
+</div>
 
 
 
 ### app/views/categories/show.html.erb ###
 <h1><%= @category.name %> Products</h1>
-<ul>
+<ul class="list-group">
   <% @products.each do |product| %>
-    <li>
-      <%= link_to product.name, product_path(product) %>
+    <li class="list-group-item">
+      <%= link_to product.name, product_path(product), class: 'text-decoration-none' %>
       - <%= number_to_currency(product.price) %>
     </li>
   <% end %>
 </ul>
-<%= link_to 'Back to Home', root_path %>
+<%= link_to 'Back to Home', root_path, class: 'btn btn-secondary mt-3' %>
 
 
 
@@ -1965,36 +2182,48 @@ end
 
 
 ### app/views/home/index.html.erb ###
-<h1>Welcome to Amazonia Pet Supplies</h1>
-<p>Your one-stop shop for all your pet supply needs!</p>
+<h1 class="text-center mb-4">Welcome to Amazonia Pet Supplies</h1>
+<p class="text-center mb-4">Your one-stop shop for all your pet supply needs!</p>
 
-<%= form_with url: search_path, method: :get, local: true do %>
-  <div class="form-group">
-    <%= label_tag :keyword, 'Search by keyword:' %>
-    <%= text_field_tag :keyword, params[:keyword], class: 'form-control' %>
+<%= form_with url: search_path, method: :get, local: true, class: 'mb-4' do %>
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <%= label_tag :keyword, 'Search by keyword:', class: 'form-label' %>
+      <%= text_field_tag :keyword, params[:keyword], class: 'form-control' %>
+    </div>
+    <div class="col-md-4 mb-3">
+      <%= label_tag :category_id, 'Filter by category:', class: 'form-label' %>
+      <%= select_tag :category_id, options_from_collection_for_select(@categories, :id, :name, params[:category_id]), include_blank: true, class: 'form-select' %>
+    </div>
+    <div class="col-md-2 d-flex align-items-end mb-3">
+      <%= submit_tag 'Search', class: 'btn btn-primary w-100' %>
+    </div>
   </div>
-  <div class="form-group">
-    <%= label_tag :category_id, 'Filter by category:' %>
-    <%= select_tag :category_id, options_from_collection_for_select(@categories, :id, :name, params[:category_id]), include_blank: true, class: 'form-control' %>
-  </div>
-  <%= submit_tag 'Search', class: 'btn btn-primary' %>
 <% end %>
+
+<div class="d-flex justify-content-center">
+  <%= link_to 'View Cart', cart_path, class: 'btn btn-primary mt-4' %>
+</div>
 
 <h2>Search Results</h2>
 <% if @products.present? %>
-  <ul>
+  <ul class="list-group">
     <% @products.each do |product| %>
-      <li>
-        <%= link_to product.name, product_path(product) %>
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <%= link_to product.name, product_path(product), class: 'text-decoration-none' %>
         - <%= number_to_currency(product.price) %>
+        <% if product.image.attached? %>
+          <%= image_tag url_for(product.image), alt: product.name, class: 'img-fluid rounded' %>
+        <% end %>
       </li>
     <% end %>
   </ul>
 <% else %>
-  <p>No products found</p>
+  <p class="text-center">No products found</p>
 <% end %>
 
-<%= link_to 'View Cart', cart_path, class: 'btn btn-primary' %>
+
+
 
 
 ### app/views/home/search.html.erb ###
@@ -2031,6 +2260,75 @@ end
 
 
 
+### app/views/kaminari/_first_page.html.erb ###
+<li class="page-item">
+  <%= link_to_unless current_page.first?, raw(t('views.pagination.first')), url, remote: remote, class: 'page-link' %>
+</li>
+
+
+
+### app/views/kaminari/_gap.html.erb ###
+<li class="page-item disabled">
+  <span class="page-link"><%= raw(t('views.pagination.truncate')) %></span>
+</li>
+
+
+
+### app/views/kaminari/_last_page.html.erb ###
+<li class="page-item">
+  <%= link_to_unless current_page.last?, raw(t('views.pagination.last')), url, remote: remote, class: 'page-link' %>
+</li>
+
+
+
+### app/views/kaminari/_next_page.html.erb ###
+<li class="page-item">
+  <%= link_to_unless current_page.last?, raw(t('views.pagination.next')), url, rel: 'next', remote: remote, class: 'page-link' %>
+</li>
+
+
+
+### app/views/kaminari/_page.html.erb ###
+<% if page.current? %>
+  <li class="page-item active" aria-current="page">
+    <span class="page-link"><%= page.number %></span>
+  </li>
+<% else %>
+  <li class="page-item">
+    <%= link_to page.number, url, remote: remote, rel: page.rel, class: 'page-link' %>
+  </li>
+<% end %>
+
+
+
+### app/views/kaminari/_paginator.html.erb ###
+<%= paginator.render do %>
+  <nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+      <%= first_page_tag unless current_page.first? %>
+      <%= prev_page_tag unless current_page.first? %>
+      <% each_page do |page| %>
+        <% if page.left_outer? || page.right_outer? || page.inside_window? %>
+          <%= page_tag page %>
+        <% elsif !page.was_truncated? -%>
+          <%= gap_tag %>
+        <% end %>
+      <% end %>
+      <%= next_page_tag unless current_page.last? %>
+      <%= last_page_tag unless current_page.last? %>
+    </ul>
+  </nav>
+<% end %>
+
+
+
+### app/views/kaminari/_prev_page.html.erb ###
+<li class="page-item">
+  <%= link_to_unless current_page.first?, raw(t('views.pagination.previous')), url, rel: 'prev', remote: remote, class: 'page-link' %>
+</li>
+
+
+
 ### app/views/layouts/active_admin.html.erb ###
 <!DOCTYPE html>
 <html>
@@ -2062,45 +2360,62 @@ end
 <!DOCTYPE html>
 <html>
   <head>
-    <title>AmazoniaPetSupplies</title>
+    <title>Amazonia Pet Supplies</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <%= stylesheet_link_tag "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css", integrity: "sha384-...", crossorigin: "anonymous" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
-
   </head>
 
-
   <body>
-    <nav>
-      <ul>
-        <li><%= link_to 'Home', root_path %></li>
-        <li><%= link_to 'About', page_path(Page.find_by(title: 'About')) %></li>
-        <li><%= link_to 'Contact', page_path(Page.find_by(title: 'Contact')) %></li>
-        <li><%= link_to 'Products', products_path %></li>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand" href="<%= root_path %>">Amazonia Pet Supplies</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><%= link_to 'Home', root_path, class: 'nav-link' %></li>
+        <li class="nav-item"><%= link_to 'About', page_path(Page.find_by(title: 'About')), class: 'nav-link' %></li>
+        <li class="nav-item"><%= link_to 'Contact', page_path(Page.find_by(title: 'Contact')), class: 'nav-link' %></li>
+        <li class="nav-item"><%= link_to 'Products', products_path, class: 'nav-link' %></li>
         <% if user_signed_in? %>
-          <li><%= link_to 'Orders', orders_path %></li> <!-- Link to orders page -->
-          <li><%= link_to 'Logout', custom_destroy_user_session_path, method: :delete %></li>
+          <li class="nav-item"><%= link_to 'Orders', orders_path, class: 'nav-link' %></li>
+          <li class="nav-item"><%= link_to 'Logout', custom_destroy_user_session_path, method: :delete, class: 'nav-link' %></li>
         <% else %>
-          <li><%= link_to 'Login', new_user_session_path %></li>
-          <li><%= link_to 'Sign Up', new_user_registration_path %></li>
+          <li class="nav-item"><%= link_to 'Login', new_user_session_path, class: 'nav-link' %></li>
+          <li class="nav-item"><%= link_to 'Sign Up', new_user_registration_path, class: 'nav-link' %></li>
         <% end %>
       </ul>
-    </nav>
-  <% if flash[:notice] %>
-    <div class="alert alert-success"><%= flash[:notice] %></div>
-  <% end %>
-  <% if flash[:alert] %>
-    <div class="alert alert-danger"><%= flash[:alert] %></div>
-  <% end %>
-  <% if flash[:error] %>
-    <div class="alert alert-danger"><%= flash[:error] %></div>
-  <% end %>
-    <%= yield %>
+    </div>
+  </div>
+</nav>
+
+
+    <div class="container">
+      <% if flash[:notice] %>
+        <div class="alert alert-success"><%= flash[:notice] %></div>
+      <% end %>
+      <% if flash[:alert] %>
+        <div class="alert alert-danger"><%= flash[:alert] %></div>
+      <% end %>
+      <% if flash[:error] %>
+        <div class="alert alert-danger"><%= flash[:error] %></div>
+      <% end %>
+
+      <%= yield %>
+    </div>
+
+
   </body>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
 </html>
+
 
 
 ### app/views/layouts/mailer.html.erb ###
@@ -2126,11 +2441,10 @@ end
 
 
 ### app/views/orders/index.html.erb ###
-<!-- app/views/orders/index.html.erb -->
 <h1>Your Orders</h1>
 
 <% if @orders.any? %>
-  <table>
+  <table class="table table-striped">
     <thead>
       <tr>
         <th>Order ID</th>
@@ -2147,7 +2461,7 @@ end
           <td><%= number_to_currency(order.total_amount) %></td>
           <td><%= order.status.humanize %></td>
           <td><%= order.created_at.strftime("%Y-%m-%d") %></td>
-          <td><%= link_to 'View', order_path(order) %></td>
+          <td><%= link_to 'View', order_path(order), class: 'btn btn-primary btn-sm' %></td>
         </tr>
       <% end %>
     </tbody>
@@ -2159,27 +2473,29 @@ end
 
 
 ### app/views/orders/new.html.erb ###
-<!-- app/views/orders/new.html.erb -->
 <h1>Checkout</h1>
+
 <%= form_with model: @order, local: true, id: 'order_form' do |form| %>
-  <div>
-    <%= form.label :recipient_name, "Recipient Name" %>
-    <%= form.text_field :recipient_name, value: current_user.username %>
+  <div class="mb-3">
+    <%= form.label :recipient_name, "Recipient Name", class: 'form-label' %>
+    <%= form.text_field :recipient_name, value: current_user.username, class: 'form-control' %>
   </div>
-  <div>
-    <%= form.label :recipient_address, "Recipient Address" %>
-    <%= form.text_field :recipient_address, value: current_user.address %>
+  <div class="mb-3">
+    <%= form.label :recipient_address, "Recipient Address", class: 'form-label' %>
+    <%= form.text_field :recipient_address, value: current_user.address, class: 'form-control' %>
   </div>
-  <div>
-    <%= form.label :province %>
-    <%= form.collection_select :province_id, Province.all, :id, :name, selected: current_user.province_id, id: 'order_province_id' %>
+  <div class="mb-3">
+    <%= form.label :province, class: 'form-label' %>
+    <%= form.collection_select :province_id, Province.all, :id, :name, selected: current_user.province_id, id: 'order_province_id', class: 'form-select' %>
   </div>
-  <div>
-    <%= form.label :total_amount %>
-    <%= form.number_field :total_amount, value: @order.total_amount, readonly: true, id: "order_total_amount" %>
+  <div class="mb-3">
+    <%= form.label :total_amount, class: 'form-label' %>
+    <%= form.number_field :total_amount, value: @order.total_amount, readonly: true, id: "order_total_amount", class: 'form-control' %>
   </div>
-  <%= form.submit 'Place Order' %>
-  <button type="button" onclick="updateTotal()">Update Total</button>
+  <div class="d-grid gap-2">
+    <%= form.submit 'Place Order', class: 'btn btn-success' %>
+    <button type="button" class="btn btn-primary" onclick="updateTotal()">Update Total</button>
+  </div>
 <% end %>
 
 <script>
@@ -2206,39 +2522,101 @@ end
 
 ### app/views/orders/show.html.erb ###
 <!-- app/views/orders/show.html.erb -->
-<h1>Order Details</h1>
+<div class="container my-5">
+  <h1 class="mb-4">Order Details</h1>
 
-<p><strong>Order ID:</strong> <%= @order.id %></p>
-<p><strong>Status:</strong> <%= @order.status.humanize %></p>
-<% if session[:recipient_name] %>
-<h2>Recipient Details</h2>
-<ul>
-  <li><strong>Recipient Name:</strong> <%= session[:recipient_name] %></li>
-  <li><strong>Recipient Address:</strong> <%= session[:recipient_address] %></li>
-</ul>
-<% end %>
-<h2>Order Items</h2>
-<ul>
-  <% @order.order_items.each do |item| %>
-    <li>
-      <%= item.product.name %> - Quantity: <%= item.quantity %> - Price: <%= number_to_currency(item.price) %>
-    </li>
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Order Information</h5>
+      <p><strong>Order ID:</strong> <%= @order.id %></p>
+      <p><strong>Status:</strong> <span class="badge bg-info"><%= @order.status.humanize %></span></p>
+    </div>
+  </div>
+
+  <% if session[:recipient_name] %>
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Recipient Details</h5>
+        <ul class="list-group">
+          <li class="list-group-item"><strong>Recipient Name:</strong> <%= session[:recipient_name] %></li>
+          <li class="list-group-item"><strong>Recipient Address:</strong> <%= session[:recipient_address] %></li>
+        </ul>
+      </div>
+    </div>
   <% end %>
-</ul>
 
-<h2>Taxes</h2>
-<p><strong>GST:</strong> <%= number_to_currency(@order.total_amount * @order.gst_rate / 100.0) %></p>
-<p><strong>PST:</strong> <%= number_to_currency(@order.total_amount * @order.pst_rate / 100.0) %></p>
-<p><strong>QST:</strong> <%= number_to_currency(@order.total_amount * @order.qst_rate / 100.0) %></p>
-<p><strong>HST:</strong> <%= number_to_currency(@order.total_amount * @order.hst_rate / 100.0) %></p>
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Order Items</h5>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @order.order_items.each do |item| %>
+            <tr>
+              <td><%= item.product.name %></td>
+              <td><%= item.quantity %></td>
+              <td><%= number_to_currency(item.price) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-<p><strong>Grand Total:</strong> <%= number_to_currency(@order.total_amount) %></p>
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Taxes</h5>
+      <% gst_rate = @order.gst_rate || 0.0 %>
+      <% pst_rate = @order.pst_rate || 0.0 %>
+      <% qst_rate = @order.qst_rate || 0.0 %>
+      <% hst_rate = @order.hst_rate || 0.0 %>
 
-<% if @order.new_order? %>
-  <h3>Payment Options</h3>
-  <p>This order is pending payment. Please choose one of the following payment options:</p>
-  <%= link_to 'Proceed to Payment', new_order_payment_path(@order, use_stripe: true), class: 'button' %>
-<% end %>
+      <table class="table">
+        <tbody>
+          <tr>
+            <th>GST:</th>
+            <td><%= number_to_currency(@order.total_amount * gst_rate / 100.0) %></td>
+          </tr>
+          <tr>
+            <th>PST:</th>
+            <td><%= number_to_currency(@order.total_amount * pst_rate / 100.0) %></td>
+          </tr>
+          <tr>
+            <th>QST:</th>
+            <td><%= number_to_currency(@order.total_amount * qst_rate / 100.0) %></td>
+          </tr>
+          <tr>
+            <th>HST:</th>
+            <td><%= number_to_currency(@order.total_amount * hst_rate / 100.0) %></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Grand Total</h5>
+      <p class="h4"><strong><%= number_to_currency(@order.total_amount) %></strong></p>
+    </div>
+  </div>
+
+  <% if @order.new_order? %>
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Payment Options</h5>
+        <p>This order is pending payment. Please choose one of the following payment options:</p>
+        <%= link_to 'Proceed to Payment', new_order_payment_path(@order, use_stripe: true), class: 'btn btn-primary' %>
+      </div>
+    </div>
+  <% end %>
+</div>
 
 
 
@@ -2397,33 +2775,42 @@ end
 
 
 ### app/views/products/index.html.erb ###
-
 <h1>Available Products</h1>
 
-<%= link_to "All Products", products_path %> |
-<%= link_to "On Sale", products_path(filter: "on_sale") %> |
-<%= link_to "Newly Added", products_path(filter: "newly_added") %> |
-<%= link_to "Recently Updated", products_path(filter: "recently_updated") %>
+<div class="mb-3">
+  <%= link_to "All Products", products_path, class: 'btn btn-outline-secondary' %>
+  <%= link_to "On Sale", products_path(filter: "on_sale"), class: 'btn btn-outline-secondary' %>
+  <%= link_to "Newly Added", products_path(filter: "newly_added"), class: 'btn btn-outline-secondary' %>
+  <%= link_to "Recently Updated", products_path(filter: "recently_updated"), class: 'btn btn-outline-secondary' %>
+</div>
 
-<%= search_form_for @q, url: products_path, method: :get do |f| %>
-  <div>
-    <%= f.label :name_cont, "Keyword" %>
-    <%= f.search_field :name_cont %>
-  </div>
-  <div>
-    <%= f.label :categories_id_eq, "Category" %>
-    <%= f.collection_select :categories_id_eq, Category.all, :id, :name, include_blank: "All Categories" %>
-  </div>
-  <div>
-    <%= f.submit "Search" %>
+<%= search_form_for @q, url: products_path, method: :get, class: 'mb-4' do |f| %>
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <%= f.label :name_cont, "Keyword", class: 'form-label' %>
+      <%= f.search_field :name_cont, class: 'form-control' %>
+    </div>
+    <div class="col-md-4 mb-3">
+      <%= f.label :categories_id_eq, "Category", class: 'form-label' %>
+      <%= f.collection_select :categories_id_eq, Category.all, :id, :name, include_blank: "All Categories", class: 'form-select' %>
+    </div>
+    <div class="col-md-2 d-flex align-items-end mb-3">
+      <%= f.submit "Search", class: 'btn btn-primary w-100' %>
+    </div>
   </div>
 <% end %>
 
-<% @products.each do |product| %>
-  <%= render partial: "product", locals: { product: product } %>
-<% end %>
+<div class="row">
+  <% @products.each do |product| %>
+    <div class="col-md-4 mb-4">
+      <%= render partial: "product", locals: { product: product } %>
+    </div>
+  <% end %>
+</div>
 
 <%= paginate @products %>
+
+
 
 
 
@@ -2484,13 +2871,18 @@ end
 
 
 ### app/views/products/_product.html.erb ###
-<div class="product">
-  <h2><%= link_to product.name, product_path(product) %></h2>
-  <p><%= product.description %></p>
-  <p><%= number_to_currency(product.price) %></p>
-  <%= image_tag product.image.variant(resize_to_limit: [300, 300]) if product.image.attached? %>
-
-
+<div class="product card h-100">
+  <% if product.image.attached? %>
+    <%= image_tag product.image.variant(resize_to_limit: [300, 300]), class: 'card-img-top' %>
+  <% end %>
+  <div class="card-body">
+    <h5 class="card-title"><%= link_to product.name, product_path(product) %></h5>
+    <p class="card-text"><%= product.description %></p>
+    <p class="card-text"><strong><%= number_to_currency(product.price) %></strong></p>
+  </div>
+  <div class="card-footer">
+    <%= button_to 'Add to Cart', add_to_cart_path(product), method: :post, class: 'btn btn-success w-100' %>
+  </div>
 </div>
 
 
@@ -2828,6 +3220,9 @@ require "active_storage/engine"
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
+
+require 'kaminari' # Add this line
+require 'kaminari-bootstrap'
 
 module AmazoniaPetSupplies
   class Application < Rails::Application
@@ -3174,6 +3569,7 @@ pin "@hotwired/stimulus", to: "stimulus.min.js"
 pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"
 pin_all_from "app/javascript/controllers", under: "controllers"
 pin "@rails/ujs", to: "rails-ujs.js"
+pin "bootstrap", to: "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
 
 
 ### config/initializers/active_admin.rb ###
@@ -3925,6 +4321,27 @@ Rails.application.config.filter_parameters += [
 # ActiveSupport::Inflector.inflections(:en) do |inflect|
 #   inflect.acronym "RESTful"
 # end
+
+
+
+### config/initializers/kaminari.rb ###
+require 'kaminari'
+require 'kaminari-bootstrap'
+
+
+
+### config/initializers/kaminari_config.rb ###
+Kaminari.configure do |config|
+  config.default_per_page = 25
+  config.max_per_page = nil
+  config.window = 4
+  config.outer_window = 0
+  config.left = 0
+  config.right = 0
+  config.page_method_name = :page
+  config.param_name = :page
+  config.params_on_first_page = false
+end
 
 
 
@@ -4877,9 +5294,11 @@ gem 'devise'
 gem 'sassc-rails'
 gem 'activeadmin_quill_editor'
 gem 'jquery-rails'
-gem 'bootstrap', '~> 5.1.0'
+gem 'bootstrap', '~> 5.3.0'
+gem 'sass-rails', '>= 6'
 gem 'faker'
 gem 'kaminari'
+gem 'kaminari-bootstrap'
 gem 'rails-ujs'
 gem 'turbolinks', '~> 5'
 gem "importmap-rails"

@@ -1,30 +1,41 @@
-<h1>Welcome to Amazonia Pet Supplies</h1>
-<p>Your one-stop shop for all your pet supply needs!</p>
+<h1 class="text-center mb-4">Welcome to Amazonia Pet Supplies</h1>
+<p class="text-center mb-4">Your one-stop shop for all your pet supply needs!</p>
 
-<%= form_with url: search_path, method: :get, local: true do %>
-  <div class="form-group">
-    <%= label_tag :keyword, 'Search by keyword:' %>
-    <%= text_field_tag :keyword, params[:keyword], class: 'form-control' %>
+<%= form_with url: search_path, method: :get, local: true, class: 'mb-4' do %>
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <%= label_tag :keyword, 'Search by keyword:', class: 'form-label' %>
+      <%= text_field_tag :keyword, params[:keyword], class: 'form-control' %>
+    </div>
+    <div class="col-md-4 mb-3">
+      <%= label_tag :category_id, 'Filter by category:', class: 'form-label' %>
+      <%= select_tag :category_id, options_from_collection_for_select(@categories, :id, :name, params[:category_id]), include_blank: true, class: 'form-select' %>
+    </div>
+    <div class="col-md-2 d-flex align-items-end mb-3">
+      <%= submit_tag 'Search', class: 'btn btn-primary w-100' %>
+    </div>
   </div>
-  <div class="form-group">
-    <%= label_tag :category_id, 'Filter by category:' %>
-    <%= select_tag :category_id, options_from_collection_for_select(@categories, :id, :name, params[:category_id]), include_blank: true, class: 'form-control' %>
-  </div>
-  <%= submit_tag 'Search', class: 'btn btn-primary' %>
 <% end %>
+
+<div class="d-flex justify-content-center">
+  <%= link_to 'View Cart', cart_path, class: 'btn btn-primary mt-4' %>
+</div>
 
 <h2>Search Results</h2>
 <% if @products.present? %>
-  <ul>
+  <ul class="list-group">
     <% @products.each do |product| %>
-      <li>
-        <%= link_to product.name, product_path(product) %>
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <%= link_to product.name, product_path(product), class: 'text-decoration-none' %>
         - <%= number_to_currency(product.price) %>
+        <% if product.image.attached? %>
+          <%= image_tag url_for(product.image), alt: product.name, class: 'img-fluid rounded' %>
+        <% end %>
       </li>
     <% end %>
   </ul>
 <% else %>
-  <p>No products found</p>
+  <p class="text-center">No products found</p>
 <% end %>
 
-<%= link_to 'View Cart', cart_path, class: 'btn btn-primary' %>
+

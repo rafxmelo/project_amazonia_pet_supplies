@@ -1,34 +1,96 @@
 <!-- app/views/orders/show.html.erb -->
-<h1>Order Details</h1>
+<div class="container my-5">
+  <h1 class="mb-4">Order Details</h1>
 
-<p><strong>Order ID:</strong> <%= @order.id %></p>
-<p><strong>Status:</strong> <%= @order.status.humanize %></p>
-<% if session[:recipient_name] %>
-<h2>Recipient Details</h2>
-<ul>
-  <li><strong>Recipient Name:</strong> <%= session[:recipient_name] %></li>
-  <li><strong>Recipient Address:</strong> <%= session[:recipient_address] %></li>
-</ul>
-<% end %>
-<h2>Order Items</h2>
-<ul>
-  <% @order.order_items.each do |item| %>
-    <li>
-      <%= item.product.name %> - Quantity: <%= item.quantity %> - Price: <%= number_to_currency(item.price) %>
-    </li>
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Order Information</h5>
+      <p><strong>Order ID:</strong> <%= @order.id %></p>
+      <p><strong>Status:</strong> <span class="badge bg-info"><%= @order.status.humanize %></span></p>
+    </div>
+  </div>
+
+  <% if session[:recipient_name] %>
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Recipient Details</h5>
+        <ul class="list-group">
+          <li class="list-group-item"><strong>Recipient Name:</strong> <%= session[:recipient_name] %></li>
+          <li class="list-group-item"><strong>Recipient Address:</strong> <%= session[:recipient_address] %></li>
+        </ul>
+      </div>
+    </div>
   <% end %>
-</ul>
 
-<h2>Taxes</h2>
-<p><strong>GST:</strong> <%= number_to_currency(@order.total_amount * @order.gst_rate / 100.0) %></p>
-<p><strong>PST:</strong> <%= number_to_currency(@order.total_amount * @order.pst_rate / 100.0) %></p>
-<p><strong>QST:</strong> <%= number_to_currency(@order.total_amount * @order.qst_rate / 100.0) %></p>
-<p><strong>HST:</strong> <%= number_to_currency(@order.total_amount * @order.hst_rate / 100.0) %></p>
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Order Items</h5>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @order.order_items.each do |item| %>
+            <tr>
+              <td><%= item.product.name %></td>
+              <td><%= item.quantity %></td>
+              <td><%= number_to_currency(item.price) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-<p><strong>Grand Total:</strong> <%= number_to_currency(@order.total_amount) %></p>
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Taxes</h5>
+      <% gst_rate = @order.gst_rate || 0.0 %>
+      <% pst_rate = @order.pst_rate || 0.0 %>
+      <% qst_rate = @order.qst_rate || 0.0 %>
+      <% hst_rate = @order.hst_rate || 0.0 %>
 
-<% if @order.new_order? %>
-  <h3>Payment Options</h3>
-  <p>This order is pending payment. Please choose one of the following payment options:</p>
-  <%= link_to 'Proceed to Payment', new_order_payment_path(@order, use_stripe: true), class: 'button' %>
-<% end %>
+      <table class="table">
+        <tbody>
+          <tr>
+            <th>GST:</th>
+            <td><%= number_to_currency(@order.total_amount * gst_rate / 100.0) %></td>
+          </tr>
+          <tr>
+            <th>PST:</th>
+            <td><%= number_to_currency(@order.total_amount * pst_rate / 100.0) %></td>
+          </tr>
+          <tr>
+            <th>QST:</th>
+            <td><%= number_to_currency(@order.total_amount * qst_rate / 100.0) %></td>
+          </tr>
+          <tr>
+            <th>HST:</th>
+            <td><%= number_to_currency(@order.total_amount * hst_rate / 100.0) %></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Grand Total</h5>
+      <p class="h4"><strong><%= number_to_currency(@order.total_amount) %></strong></p>
+    </div>
+  </div>
+
+  <% if @order.new_order? %>
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Payment Options</h5>
+        <p>This order is pending payment. Please choose one of the following payment options:</p>
+        <%= link_to 'Proceed to Payment', new_order_payment_path(@order, use_stripe: true), class: 'btn btn-primary' %>
+      </div>
+    </div>
+  <% end %>
+</div>

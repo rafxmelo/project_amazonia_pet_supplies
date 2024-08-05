@@ -1,0 +1,81 @@
+// app/assets/stylesheets/active_admin/active_admin_overrides.scss
+
+// Import the original active_admin styles
+@import 'active_admin/base';
+
+body.active_admin {
+  font-size: 14px;  // Adjust base font size
+
+  // Customize header
+  #header h1 {
+    font-size: 1.5rem;  // Adjust font size for headers
+  }
+
+  // Customize sidebar
+  #sidebar {
+    font-size: 0.9rem;
+  }
+
+  // Customize table elements
+  table.index_table {
+    font-size: 0.9rem;  // Standard table font size
+
+    th {
+      font-weight: bold;
+      font-size: 1rem;  // Slightly larger for headers
+    }
+
+    td {
+      word-wrap: break-word;  // Prevent overflow of text
+    }
+  }
+
+  // Form inputs and labels
+  form {
+    label {
+      font-weight: 600;
+    }
+
+    input, select, textarea {
+      font-size: 0.9rem;
+    }
+  }
+
+  // Buttons
+  .action_items .action_item a {
+    font-size: 0.85rem;  // Slightly smaller buttons
+    padding: 6px 12px;  // Adjust padding for consistency
+  }
+
+  // Pagination
+  .pagination {
+    font-size: 0.85rem;
+  }
+
+  // Other specific components
+  .flash, .filters_sidebar_section {
+    font-size: 0.9rem;
+  }
+}
+
+// Specific customizations for other elements
+.panel {
+  h3 {
+    font-size: 1.25rem;
+  }
+}
+
+.admin-orders-show {
+  h2, h3 {
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+  }
+
+  p, ul {
+    font-size: 0.95rem;
+  }
+
+  .page-item.active {
+    font-weight: bold;
+  }
+}

@@ -1,8 +1,13 @@
-<div class="product">
-  <h2><%= link_to product.name, product_path(product) %></h2>
-  <p><%= product.description %></p>
-  <p><%= number_to_currency(product.price) %></p>
-  <%= image_tag product.image.variant(resize_to_limit: [300, 300]) if product.image.attached? %>
-
-
+<div class="product card h-100">
+  <% if product.image.attached? %>
+    <%= image_tag product.image.variant(resize_to_limit: [300, 300]), class: 'card-img-top' %>
+  <% end %>
+  <div class="card-body">
+    <h5 class="card-title"><%= link_to product.name, product_path(product) %></h5>
+    <p class="card-text"><%= product.description %></p>
+    <p class="card-text"><strong><%= number_to_currency(product.price) %></strong></p>
+  </div>
+  <div class="card-footer">
+    <%= button_to 'Add to Cart', add_to_cart_path(product), method: :post, class: 'btn btn-success w-100' %>
+  </div>
 </div>

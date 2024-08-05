@@ -1,24 +1,26 @@
-<!-- app/views/orders/new.html.erb -->
 <h1>Checkout</h1>
+
 <%= form_with model: @order, local: true, id: 'order_form' do |form| %>
-  <div>
-    <%= form.label :recipient_name, "Recipient Name" %>
-    <%= form.text_field :recipient_name, value: current_user.username %>
+  <div class="mb-3">
+    <%= form.label :recipient_name, "Recipient Name", class: 'form-label' %>
+    <%= form.text_field :recipient_name, value: current_user.username, class: 'form-control' %>
   </div>
-  <div>
-    <%= form.label :recipient_address, "Recipient Address" %>
-    <%= form.text_field :recipient_address, value: current_user.address %>
+  <div class="mb-3">
+    <%= form.label :recipient_address, "Recipient Address", class: 'form-label' %>
+    <%= form.text_field :recipient_address, value: current_user.address, class: 'form-control' %>
   </div>
-  <div>
-    <%= form.label :province %>
-    <%= form.collection_select :province_id, Province.all, :id, :name, selected: current_user.province_id, id: 'order_province_id' %>
+  <div class="mb-3">
+    <%= form.label :province, class: 'form-label' %>
+    <%= form.collection_select :province_id, Province.all, :id, :name, selected: current_user.province_id, id: 'order_province_id', class: 'form-select' %>
   </div>
-  <div>
-    <%= form.label :total_amount %>
-    <%= form.number_field :total_amount, value: @order.total_amount, readonly: true, id: "order_total_amount" %>
+  <div class="mb-3">
+    <%= form.label :total_amount, class: 'form-label' %>
+    <%= form.number_field :total_amount, value: @order.total_amount, readonly: true, id: "order_total_amount", class: 'form-control' %>
   </div>
-  <%= form.submit 'Place Order' %>
-  <button type="button" onclick="updateTotal()">Update Total</button>
+  <div class="d-grid gap-2">
+    <%= form.submit 'Place Order', class: 'btn btn-success' %>
+    <button type="button" class="btn btn-primary" onclick="updateTotal()">Update Total</button>
+  </div>
 <% end %>
 
 <script>

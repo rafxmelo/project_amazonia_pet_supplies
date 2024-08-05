@@ -1,13 +1,29 @@
+// Import Bootstrap
 @import "bootstrap";
 
+// Variables
+$primary-color: #3498db;
+$secondary-color: #2980b9;
+$font-stack: 'Arial', sans-serif;
+
+// Body styling
 body {
-  font-family: Arial, sans-serif;
-}
-
-h1 {
+  font-family: $font-stack;
   color: #2c3e50;
+  background-color: #f8f9fa;
+  font-size: 14px;
+  .container {
+    margin-top: 20px;
+  }
 }
 
+// Header styles
+h1 {
+  color: $primary-color;
+  margin-bottom: 20px;
+}
+
+// List styling
 ul {
   list-style-type: none;
   padding: 0;
@@ -17,42 +33,135 @@ li {
   margin: 10px 0;
 }
 
-img {
-  max-width: 100px;
-  height: auto;
-  display: block;
-  margin-bottom: 10px;
-}
-
+// Button styling
 .btn {
-  background-color: #3498db;
+  background-color: $primary-color;
   color: white;
   padding: 10px 20px;
   text-decoration: none;
   border-radius: 5px;
+  border: none;
+
+  &:hover {
+    background-color: $secondary-color;
+    color: white;
+  }
 }
 
-.btn-primary {
-  background-color: #2980b9;
-}
-
-.btn:hover {
-  background-color: #2980b9;
-  color: white;
-}
 .alert {
   padding: 15px;
   margin-bottom: 20px;
   border: 1px solid transparent;
   border-radius: 4px;
+
+  &.alert-danger {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+  }
+
+  &.alert-success {
+    color: #3c763d;
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+  }
 }
-.alert-danger {
-  color: #a94442;
-  background-color: #f2dede;
-  border-color: #ebccd1;
+
+// Image styling
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin-bottom: 10px;
 }
-.alert-success {
-  color: #3c763d;
-  background-color: #dff0d8;
-  border-color: #d6e9c6;
+
+// Navbar styling
+.navbar {
+  margin-bottom: 20px;
+
+  .nav-link {
+    color: #fff !important;
+
+    &:hover {
+      color: $secondary-color !important;
+    }
+  }
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+h1 {
+  font-size: 2rem; /* Adjust as necessary */
+}
+
+h2 {
+  font-size: 1.75rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+}
+
+th, td {
+  font-size: 1rem; /* Consistent table font size */
+  word-break: break-word; /* Prevents text overflow */
+}
+
+.btn {
+  font-size: 0.875rem; /* Smaller font size for buttons */
+}
+
+.admin-dashboard .panel-heading {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.admin-dashboard .panel-body {
+  font-size: 1rem;
+}
+@media (max-width: 1200px) {
+  body {
+    font-size: 13px; /* Adjust for smaller screens */
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  h2 {
+    font-size: 1.6rem;
+  }
+
+  h3 {
+    font-size: 1.4rem;
+  }
+
+  th, td {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: 12px;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+  }
+
+  th, td {
+    font-size: 0.8rem;
+  }
 }

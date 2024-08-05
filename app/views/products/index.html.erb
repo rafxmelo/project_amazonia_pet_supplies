@@ -1,27 +1,36 @@
-
 <h1>Available Products</h1>
 
-<%= link_to "All Products", products_path %> |
-<%= link_to "On Sale", products_path(filter: "on_sale") %> |
-<%= link_to "Newly Added", products_path(filter: "newly_added") %> |
-<%= link_to "Recently Updated", products_path(filter: "recently_updated") %>
+<div class="mb-3">
+  <%= link_to "All Products", products_path, class: 'btn btn-outline-secondary' %>
+  <%= link_to "On Sale", products_path(filter: "on_sale"), class: 'btn btn-outline-secondary' %>
+  <%= link_to "Newly Added", products_path(filter: "newly_added"), class: 'btn btn-outline-secondary' %>
+  <%= link_to "Recently Updated", products_path(filter: "recently_updated"), class: 'btn btn-outline-secondary' %>
+</div>
 
-<%= search_form_for @q, url: products_path, method: :get do |f| %>
-  <div>
-    <%= f.label :name_cont, "Keyword" %>
-    <%= f.search_field :name_cont %>
-  </div>
-  <div>
-    <%= f.label :categories_id_eq, "Category" %>
-    <%= f.collection_select :categories_id_eq, Category.all, :id, :name, include_blank: "All Categories" %>
-  </div>
-  <div>
-    <%= f.submit "Search" %>
+<%= search_form_for @q, url: products_path, method: :get, class: 'mb-4' do |f| %>
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <%= f.label :name_cont, "Keyword", class: 'form-label' %>
+      <%= f.search_field :name_cont, class: 'form-control' %>
+    </div>
+    <div class="col-md-4 mb-3">
+      <%= f.label :categories_id_eq, "Category", class: 'form-label' %>
+      <%= f.collection_select :categories_id_eq, Category.all, :id, :name, include_blank: "All Categories", class: 'form-select' %>
+    </div>
+    <div class="col-md-2 d-flex align-items-end mb-3">
+      <%= f.submit "Search", class: 'btn btn-primary w-100' %>
+    </div>
   </div>
 <% end %>
 
-<% @products.each do |product| %>
-  <%= render partial: "product", locals: { product: product } %>
-<% end %>
+<div class="row">
+  <% @products.each do |product| %>
+    <div class="col-md-4 mb-4">
+      <%= render partial: "product", locals: { product: product } %>
+    </div>
+  <% end %>
+</div>
 
 <%= paginate @products %>
+
+
