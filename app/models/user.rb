@@ -6,9 +6,9 @@ class User < ApplicationRecord
   belongs_to :province, optional: true
   has_many :orders, dependent: :destroy
 
+  validates :username, presence: true, uniqueness: true
+  validates :email, presence: true, uniqueness: true
   validates :address, presence: true, if: -> { province_id.present? }
-  validates :username, :email, presence: true
-  validates :email, uniqueness: true
   validates :province_id, presence: true, on: :update
 
   def self.ransackable_attributes(auth_object = nil)

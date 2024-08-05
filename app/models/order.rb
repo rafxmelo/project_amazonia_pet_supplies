@@ -5,7 +5,8 @@ class Order < ApplicationRecord
   has_many :order_items, dependent: :destroy
   accepts_nested_attributes_for :order_items
 
-  validates :total_amount, :status, presence: true
+  validates :total_amount, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  validates :status, presence: true
   validates :payment_intent_id, presence: true, if: :stripe_payment?
 
   enum status: { new_order: 0, paid_order: 1, shipped: 2 }

@@ -5,7 +5,10 @@ class Product < ApplicationRecord
   has_many :categories, through: :product_categories
   has_one_attached :image
 
-  validates :name, :description, :price, :stock_quantity, presence: true
+  validates :name, presence: true
+  validates :description, presence: true
+  validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  validates :stock_quantity, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 
   scope :on_sale, -> { where(on_sale: true) }
   scope :newly_added, -> { where('created_at >= ?', 3.days.ago) }
