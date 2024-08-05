@@ -120,10 +120,11 @@ ActiveAdmin.register Order do
       order.order_items.map { |item| item.product.name }.join(", ")
     end
     column "Taxes" do |order|
-      gst = order.total_amount * (order.gst_rate / 100.0)
-      pst = order.total_amount * (order.pst_rate / 100.0)
-      qst = order.total_amount * (order.qst_rate / 100.0)
-      "GST: #{number_to_currency(gst)}, PST: #{number_to_currency(pst)}, QST: #{number_to_currency(qst)}"
+      gst = order.total_amount * (order.gst_rate.to_f / 100.0)
+      pst = order.total_amount * (order.pst_rate.to_f / 100.0)
+      qst = order.total_amount * (order.qst_rate.to_f / 100.0)
+      hst = order.total_amount * (order.hst_rate.to_f / 100.0)
+      "GST: #{number_to_currency(gst)}, PST: #{number_to_currency(pst)}, QST: #{number_to_currency(qst)}, HST: #{number_to_currency(hst)}"
     end
     column :total_amount do |order|
       number_to_currency(order.total_amount)
@@ -179,10 +180,11 @@ ActiveAdmin.register Order do
     end
 
     panel "Taxes" do
-      gst = order.total_amount * (order.gst_rate / 100.0)
-      pst = order.total_amount * (order.pst_rate / 100.0)
-      qst = order.total_amount * (order.qst_rate / 100.0)
-      "GST: #{number_to_currency(gst)}, PST: #{number_to_currency(pst)}, QST: #{number_to_currency(qst)}"
+      gst = order.total_amount * (order.gst_rate.to_f / 100.0)
+      pst = order.total_amount * (order.pst_rate.to_f / 100.0)
+      qst = order.total_amount * (order.qst_rate.to_f / 100.0)
+      hst = order.total_amount * (order.hst_rate.to_f / 100.0)
+      "GST: #{number_to_currency(gst)}, PST: #{number_to_currency(pst)}, QST: #{number_to_currency(qst)}, HST: #{number_to_currency(hst)}"
     end
 
     panel "Grand Total" do
@@ -317,8 +319,10 @@ end
 
 
 ### app/admin/provinces.rb ###
+# app/admin/provinces.rb
+
 ActiveAdmin.register Province do
-  permit_params :name, :gst, :pst, :qst
+  permit_params :name, :gst, :pst, :qst, :hst
 
   index do
     selectable_column
@@ -327,17 +331,40 @@ ActiveAdmin.register Province do
     column :gst
     column :pst
     column :qst
+    column :hst  # Add the HST column here
     column :created_at
     column :updated_at
     actions
   end
 
+  filter :name
+  filter :gst
+  filter :pst
+  filter :qst
+  filter :hst
+  filter :created_at
+  filter :updated_at
+
+  show do
+    attributes_table do
+      row :name
+      row :gst
+      row :pst
+      row :qst
+      row :hst
+      row :created_at
+      row :updated_at
+    end
+    active_admin_comments
+  end
+
   form do |f|
-    f.inputs do
+    f.inputs "Province Details" do
       f.input :name
       f.input :gst
       f.input :pst
       f.input :qst
+      f.input :hst
     end
     f.actions
   end
@@ -758,25 +785,30 @@ class OrdersController < ApplicationController
       @order.add_items_from_cart(session[:cart])
 
       if params[:province_id].present?
-        @order.user.province_id = params[:province_id]
-        @order.set_current_tax_rates
-        @order.calculate_total_amount
+        @order.province_id = params[:province_id]
       else
-        @order.user.province_id = current_user.province_id if current_user.province_id.present?
-        @order.set_current_tax_rates
-        @order.calculate_total_amount
+        @order.province_id = current_user.province_id if current_user.province_id.present?
       end
+
+      @order.set_current_tax_rates
+      @order.calculate_total_amount
+
       Rails.logger.debug "Order items in new action: #{@order.order_items.inspect}"
     end
   end
+
 
   def create
     @order = current_user.orders.build(order_params)
     @order.add_items_from_cart(session[:cart])
     @order.status = :new_order  # Set a default status
-    @order.province = current_user.province
+
+    # Ensure province is set
+    @order.province = Province.find(order_params[:province_id])
     @order.set_current_tax_rates
+
     Rails.logger.debug "Order before saving: #{@order.inspect}"
+
     if @order.save
       session[:cart] = {}
       flash[:notice] = 'Order placed successfully'
@@ -792,7 +824,7 @@ class OrdersController < ApplicationController
     province = Province.find(params[:province_id])
     @order = Order.new(user: current_user)
     @order.add_items_from_cart(session[:cart]) if session[:cart].present?
-    @order.user.province = province
+    @order.province = province
     @order.set_current_tax_rates
     @order.calculate_total_amount
 
@@ -1264,18 +1296,22 @@ class Order < ApplicationRecord
   def calculate_total_amount
     subtotal = order_items.sum { |item| item.quantity * item.price }
     Rails.logger.debug "Subtotal: #{subtotal}"
-    province = user.province
-    # Fetch current tax rates
-    gst_rate = gst_rate || province.gst
-    pst_rate = pst_rate || province.pst
-    qst_rate = qst_rate || province.qst
+
+    gst_rate = self.gst_rate || province&.gst || 0
+    pst_rate = self.pst_rate || province&.pst || 0
+    qst_rate = self.qst_rate || province&.qst || 0
+    hst_rate = self.hst_rate || province&.hst || 0
+
+    # Log the tax rates to debug
+    Rails.logger.debug "GST Rate: #{gst_rate}, PST Rate: #{pst_rate}, QST Rate: #{qst_rate}, HST Rate: #{hst_rate}"
 
     # Use stored tax rates for the order
     gst = subtotal * (gst_rate / 100.0)
     pst = subtotal * (pst_rate / 100.0)
     qst = subtotal * (qst_rate / 100.0)
+    hst = subtotal * (hst_rate / 100.0)
 
-    self.total_amount = subtotal + gst + pst + qst
+    self.total_amount = subtotal + gst + pst + qst + hst
     Rails.logger.debug "Calculated total amount: #{self.total_amount}"
   end
 
@@ -1285,9 +1321,14 @@ class Order < ApplicationRecord
 
   def set_current_tax_rates
     # Set current tax rates from the user's province
-    self.gst_rate ||= user.province.gst
-    self.pst_rate ||= user.province.pst
-    self.qst_rate ||= user.province.qst
+    if province.present?
+      self.gst_rate ||= province.gst || 0
+      self.pst_rate ||= province.pst || 0
+      self.qst_rate ||= province.qst || 0
+      self.hst_rate ||= province.hst || 0
+    else
+      Rails.logger.error "Province not set for order: #{self.id}"
+    end
   end
 
   before_save :calculate_total_amount
@@ -1382,8 +1423,8 @@ end
 ### app/models/province.rb ###
 class Province < ApplicationRecord
   has_many :users
-
-  validates :name, :gst, :pst, :qst, presence: true
+  validates :name, presence: true
+  validates :gst, :pst, :hst, :qst, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
   def self.ransackable_attributes(auth_object = nil)
     ["created_at", "gst", "hst", "id", "name", "pst", "qst", "updated_at"]
@@ -2186,9 +2227,10 @@ end
 </ul>
 
 <h2>Taxes</h2>
-<p><strong>GST:</strong> <%= number_to_currency(@order.total_amount * @order.user.province.gst / 100.0) %></p>
-<p><strong>PST:</strong> <%= number_to_currency(@order.total_amount * @order.user.province.pst / 100.0) %></p>
-<p><strong>QST:</strong> <%= number_to_currency(@order.total_amount * @order.user.province.qst / 100.0) %></p>
+<p><strong>GST:</strong> <%= number_to_currency(@order.total_amount * @order.gst_rate / 100.0) %></p>
+<p><strong>PST:</strong> <%= number_to_currency(@order.total_amount * @order.pst_rate / 100.0) %></p>
+<p><strong>QST:</strong> <%= number_to_currency(@order.total_amount * @order.qst_rate / 100.0) %></p>
+<p><strong>HST:</strong> <%= number_to_currency(@order.total_amount * @order.hst_rate / 100.0) %></p>
 
 <p><strong>Grand Total:</strong> <%= number_to_currency(@order.total_amount) %></p>
 
@@ -4658,6 +4700,32 @@ end
 
 
 
+### db/migrate/20240804210625_add_hst_rate_to_orders.rb ###
+class AddHstRateToOrders < ActiveRecord::Migration[7.1]
+  def change
+    add_column :orders, :hst_rate, :decimal, precision: 5, scale: 2, default: 0.0
+  end
+end
+
+
+
+### db/migrate/20240804210999_add_default_hst_rate_to_orders.rb ###
+class AddDefaultHstRateToOrders < ActiveRecord::Migration[7.1]
+  def up
+    # Set a default value for existing orders
+    Order.where(hst_rate: nil).update_all(hst_rate: 0.0)
+
+    # Ensure the column has a default value in the future
+    change_column_default :orders, :hst_rate, 0.0
+  end
+
+  def down
+    change_column_default :orders, :hst_rate, nil
+  end
+end
+
+
+
 ### db/seeds.rb ###
 require 'faker'
 require 'open-uri'
@@ -4668,24 +4736,29 @@ require 'net/http'
 ActiveRecord::Base.transaction do
   # Provinces
   provinces = [
-  { name: 'Ontario', gst: 0.05, pst: 0.08, hst: 0.13 },
-  { name: 'Quebec', gst: 0.05, pst: 0.09975, hst: 0 },
-  { name: 'British Columbia', gst: 0.05, pst: 0.07, hst: 0 },
-  { name: 'Alberta', gst: 0.05, pst: 0, hst: 0 },
-  { name: 'Manitoba', gst: 0.05, pst: 0.07, hst: 0 },
-  { name: 'Saskatchewan', gst: 0.05, pst: 0.06, hst: 0 },
-  { name: 'Nova Scotia', gst: 0.05, pst: 0, hst: 0.15 },
-  { name: 'New Brunswick', gst: 0.05, pst: 0, hst: 0.15 },
-  { name: 'Newfoundland and Labrador', gst: 0.05, pst: 0, hst: 0.15 },
-  { name: 'Prince Edward Island', gst: 0.05, pst: 0, hst: 0.15 },
-  { name: 'Northwest Territories', gst: 0.05, pst: 0, hst: 0 },
-  { name: 'Yukon', gst: 0.05, pst: 0, hst: 0 },
-  { name: 'Nunavut', gst: 0.05, pst: 0, hst: 0 }
-]
-  provinces.each do |province|
-    Province.find_or_create_by!(province)
-  end
+    { name: 'Alberta', gst: 0.05, pst: 0.0, qst: 0.0, hst: 0.0 },
+    { name: 'British Columbia', gst: 0.05, pst: 0.07, qst: 0.0, hst: 0.0 },
+    { name: 'Manitoba', gst: 0.05, pst: 0.07, qst: 0.0, hst: 0.0 },
+    { name: 'New Brunswick', gst: 0.0, pst: 0.0, qst: 0.0, hst: 0.15 },
+    { name: 'Newfoundland and Labrador', gst: 0.0, pst: 0.0, qst: 0.0, hst: 0.15 },
+    { name: 'Northwest Territories', gst: 0.05, pst: 0.0, qst: 0.0, hst: 0.0 },
+    { name: 'Nova Scotia', gst: 0.0, pst: 0.0, qst: 0.0, hst: 0.15 },
+    { name: 'Nunavut', gst: 0.05, pst: 0.0, qst: 0.0, hst: 0.0 },
+    { name: 'Ontario', gst: 0.0, pst: 0.0, qst: 0.0, hst: 0.13 },
+    { name: 'Prince Edward Island', gst: 0.0, pst: 0.0, qst: 0.0, hst: 0.15 },
+    { name: 'Quebec', gst: 0.05, pst: 0.0, qst: 0.09975, hst: 0.0 },
+    { name: 'Saskatchewan', gst: 0.05, pst: 0.06, qst: 0.0, hst: 0.0 },
+    { name: 'Yukon', gst: 0.05, pst: 0.0, qst: 0.0, hst: 0.0 }
+  ]
 
+  provinces.each do |province_data|
+    Province.find_or_create_by!(name: province_data[:name]) do |province|
+      province.gst = province_data[:gst]
+      province.pst = province_data[:pst]
+      province.qst = province_data[:qst]
+      province.hst = province_data[:hst]
+    end
+  end
   # Admin Users
   AdminUser.find_or_create_by!(email: 'admin@example.com') do |admin|
     admin.password = 'password'

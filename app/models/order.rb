@@ -33,21 +33,21 @@ class Order < ApplicationRecord
     subtotal = order_items.sum { |item| item.quantity * item.price }
     Rails.logger.debug "Subtotal: #{subtotal}"
 
-    # Fetch current tax rates
     gst_rate = self.gst_rate || province&.gst || 0
     pst_rate = self.pst_rate || province&.pst || 0
     qst_rate = self.qst_rate || province&.qst || 0
+    hst_rate = self.hst_rate || province&.hst || 0
 
     # Log the tax rates to debug
-    Rails.logger.debug "GST Rate: #{gst_rate}, PST Rate: #{pst_rate}, QST Rate: #{qst_rate}"
-
+    Rails.logger.debug "GST Rate: #{gst_rate}, PST Rate: #{pst_rate}, QST Rate: #{qst_rate}, HST Rate: #{hst_rate}"
 
     # Use stored tax rates for the order
     gst = subtotal * (gst_rate / 100.0)
     pst = subtotal * (pst_rate / 100.0)
     qst = subtotal * (qst_rate / 100.0)
+    hst = subtotal * (hst_rate / 100.0)
 
-    self.total_amount = subtotal + gst + pst + qst
+    self.total_amount = subtotal + gst + pst + qst + hst
     Rails.logger.debug "Calculated total amount: #{self.total_amount}"
   end
 
@@ -61,6 +61,7 @@ class Order < ApplicationRecord
       self.gst_rate ||= province.gst || 0
       self.pst_rate ||= province.pst || 0
       self.qst_rate ||= province.qst || 0
+      self.hst_rate ||= province.hst || 0
     else
       Rails.logger.error "Province not set for order: #{self.id}"
     end

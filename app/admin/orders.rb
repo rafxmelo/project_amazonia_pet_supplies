@@ -16,7 +16,8 @@ ActiveAdmin.register Order do
       gst = order.total_amount * (order.gst_rate.to_f / 100.0)
       pst = order.total_amount * (order.pst_rate.to_f / 100.0)
       qst = order.total_amount * (order.qst_rate.to_f / 100.0)
-      "GST: #{number_to_currency(gst)}, PST: #{number_to_currency(pst)}, QST: #{number_to_currency(qst)}"
+      hst = order.total_amount * (order.hst_rate.to_f / 100.0)
+      "GST: #{number_to_currency(gst)}, PST: #{number_to_currency(pst)}, QST: #{number_to_currency(qst)}, HST: #{number_to_currency(hst)}"
     end
     column :total_amount do |order|
       number_to_currency(order.total_amount)
@@ -75,7 +76,8 @@ ActiveAdmin.register Order do
       gst = order.total_amount * (order.gst_rate.to_f / 100.0)
       pst = order.total_amount * (order.pst_rate.to_f / 100.0)
       qst = order.total_amount * (order.qst_rate.to_f / 100.0)
-      "GST: #{number_to_currency(gst)}, PST: #{number_to_currency(pst)}, QST: #{number_to_currency(qst)}"
+      hst = order.total_amount * (order.hst_rate.to_f / 100.0)
+      "GST: #{number_to_currency(gst)}, PST: #{number_to_currency(pst)}, QST: #{number_to_currency(qst)}, HST: #{number_to_currency(hst)}"
     end
 
     panel "Grand Total" do

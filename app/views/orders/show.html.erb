@@ -23,6 +23,7 @@
 <p><strong>GST:</strong> <%= number_to_currency(@order.total_amount * @order.gst_rate / 100.0) %></p>
 <p><strong>PST:</strong> <%= number_to_currency(@order.total_amount * @order.pst_rate / 100.0) %></p>
 <p><strong>QST:</strong> <%= number_to_currency(@order.total_amount * @order.qst_rate / 100.0) %></p>
+<p><strong>HST:</strong> <%= number_to_currency(@order.total_amount * @order.hst_rate / 100.0) %></p>
 
 <p><strong>Grand Total:</strong> <%= number_to_currency(@order.total_amount) %></p>
 

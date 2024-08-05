@@ -7,24 +7,29 @@ require 'net/http'
 ActiveRecord::Base.transaction do
   # Provinces
   provinces = [
-  { name: 'Ontario', gst: 0.05, pst: 0.08, hst: 0.13 },
-  { name: 'Quebec', gst: 0.05, pst: 0.09975, hst: 0 },
-  { name: 'British Columbia', gst: 0.05, pst: 0.07, hst: 0 },
-  { name: 'Alberta', gst: 0.05, pst: 0, hst: 0 },
-  { name: 'Manitoba', gst: 0.05, pst: 0.07, hst: 0 },
-  { name: 'Saskatchewan', gst: 0.05, pst: 0.06, hst: 0 },
-  { name: 'Nova Scotia', gst: 0.05, pst: 0, hst: 0.15 },
-  { name: 'New Brunswick', gst: 0.05, pst: 0, hst: 0.15 },
-  { name: 'Newfoundland and Labrador', gst: 0.05, pst: 0, hst: 0.15 },
-  { name: 'Prince Edward Island', gst: 0.05, pst: 0, hst: 0.15 },
-  { name: 'Northwest Territories', gst: 0.05, pst: 0, hst: 0 },
-  { name: 'Yukon', gst: 0.05, pst: 0, hst: 0 },
-  { name: 'Nunavut', gst: 0.05, pst: 0, hst: 0 }
-]
-  provinces.each do |province|
-    Province.find_or_create_by!(province)
-  end
+    { name: 'Alberta', gst: 0.05, pst: 0.0, qst: 0.0, hst: 0.0 },
+    { name: 'British Columbia', gst: 0.05, pst: 0.07, qst: 0.0, hst: 0.0 },
+    { name: 'Manitoba', gst: 0.05, pst: 0.07, qst: 0.0, hst: 0.0 },
+    { name: 'New Brunswick', gst: 0.0, pst: 0.0, qst: 0.0, hst: 0.15 },
+    { name: 'Newfoundland and Labrador', gst: 0.0, pst: 0.0, qst: 0.0, hst: 0.15 },
+    { name: 'Northwest Territories', gst: 0.05, pst: 0.0, qst: 0.0, hst: 0.0 },
+    { name: 'Nova Scotia', gst: 0.0, pst: 0.0, qst: 0.0, hst: 0.15 },
+    { name: 'Nunavut', gst: 0.05, pst: 0.0, qst: 0.0, hst: 0.0 },
+    { name: 'Ontario', gst: 0.0, pst: 0.0, qst: 0.0, hst: 0.13 },
+    { name: 'Prince Edward Island', gst: 0.0, pst: 0.0, qst: 0.0, hst: 0.15 },
+    { name: 'Quebec', gst: 0.05, pst: 0.0, qst: 0.09975, hst: 0.0 },
+    { name: 'Saskatchewan', gst: 0.05, pst: 0.06, qst: 0.0, hst: 0.0 },
+    { name: 'Yukon', gst: 0.05, pst: 0.0, qst: 0.0, hst: 0.0 }
+  ]
 
+  provinces.each do |province_data|
+    Province.find_or_create_by!(name: province_data[:name]) do |province|
+      province.gst = province_data[:gst]
+      province.pst = province_data[:pst]
+      province.qst = province_data[:qst]
+      province.hst = province_data[:hst]
+    end
+  end
   # Admin Users
   AdminUser.find_or_create_by!(email: 'admin@example.com') do |admin|
     admin.password = 'password'
